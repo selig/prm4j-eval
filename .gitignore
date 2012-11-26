@@ -49,3 +49,4 @@ bin/
 lib/dacapo-9.12-bach.jar
 lib/mop/
 dacapo.log
+logs/
