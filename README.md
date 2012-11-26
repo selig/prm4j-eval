@@ -5,6 +5,7 @@ The performance of prm4j is compared with [JavaMOP 3.0.0][2] (build 232) using t
 ####Prerequisites
 
  `dacapo-9.12-bach.jar` has to be [downloaded][4] (ca. 167 MB) and placed into `lib`.
+  The [AspectJ][5] command line compiler `ajc` has to be installed, and `aspectjrt.jar` added to the classpath.
 
 - - -
 
@@ -15,3 +16,4 @@ Part of my thesis; currently in development (pre-alpha).
   [2]: http://fsl.cs.uiuc.edu/index.php/Special:JavaMOP3
   [3]: http://dacapobench.org
   [4]: http://sourceforge.net/projects/dacapobench/files/9.12-bach/dacapo-9.12-bach.jar/download
+  [5]: http://www.eclipse.org/aspectj/downloads.php
