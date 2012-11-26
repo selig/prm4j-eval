@@ -2,11 +2,11 @@
 
 # Compiles and runs JavaMOP aspects with the DaCapo-9.12-bach benchmark using aspectj load-time weaving.
 
-# usage:         sh ./javamop <monitored property> <benchmark>
+# usage:         ./javamop <monitored property> <benchmark>
 
-# example usage: sh ./javamop SafeMapIterator avrora
-#                sh ./javamop SafeMapIterator "h2 --converge"
-#                sh ./javamop SafeIterator eclipse
+# example usage: ./javamop SafeMapIterator avrora
+#                ./javamop SafeMapIterator "h2 --converge"
+#                ./javamop SafeIterator eclipse
 
 # list of all monitored properties can be found in target/jars/mop; each jar is property
 # list of all benchmarks can be found at http://dacapobench.org/benchmarks.html 
@@ -44,4 +44,4 @@ rm target/classes/META-INF/aop-ajc.xml
 
 # load-time weaving via aspectjweaver
 echo "Starting benchmark with aspectj load-time weaving..."
-java -Xms256M -Xmx1024M -javaagent:${WEAVER} -Xbootclasspath/a:${RT}:${DIR}/lib/javamoprt.jar:${DIR}/target/jars/mop/$1.jar -jar lib/dacapo-9.12-bach.jar $2
+java -Xms256M -Xmx1024M -javaagent:${WEAVER} -Xbootclasspath/a:${RT}:${DIR}/lib/javamoprt.jar:${DIR}/target/jars/mop/$1.jar -jar $DACAPO $2
