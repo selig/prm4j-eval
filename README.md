@@ -10,6 +10,7 @@ To run an an monitoring aspect with JavaMOP, run `./javamop <aspectname> <benchm
 
  `dacapo-9.12-bach.jar` has to exist somewhere on your disk. If not, you can download it [here][4] (ca. 167 MB). 
   Let prm4j-eval find it by executing `export DACAPO=path/to/dacapo-9.12-bach.jar` before usage.
+  To see if DaCapo can be found and works, run `./dacapo avrora`, which should start the benchmark instantly.
 
   You **don't** need to have [AspectJ][5] installed, the necessary dependencies are retrieved via Maven.
 
