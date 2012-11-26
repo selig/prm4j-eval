@@ -9,7 +9,11 @@
 # list of all monitored properties can be found in lib/mop; each jar is property
 # list of all benchmarks can be found at http://dacapobench.org/benchmarks.html 
 
-sh makejars.sh # repackages the properties, in case the implementation has changed (packages classes, so Eclipse has to have build them already)
+# compile the aspects into classes
+ajc -cp $CLASSPATH:lib/javamoprt.jar src/mop/* -d bin -6
+
+# repackages each aspect into a single jars with custom aop-ajc.xml
+sh makejars.sh 
 
 # load-time weaving via aspectjweaver 1.6.12
-java -Xms256M -Xmx1024M -javaagent:lib/aspectjweaver.jar -Xbootclasspath/a:aspectjrt.jar:lib/javamoprt.jar:lib/mop/$1.jar -jar lib/dacapo-9.12-bach.jar $2
+java -Xms256M -Xmx1024M -javaagent:lib/aspectjweaver.jar -Xbootclasspath/a:aspectjrt.jar:lib/javamoprt.jar:lib/mop/$1.jar -jar lib/dacapo-9.12-bach.jar $2 --converge
