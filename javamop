@@ -1,0 +1,47 @@
+#!/usr/bin/env bash
+
+# Compiles and runs JavaMOP aspects with the DaCapo-9.12-bach benchmark using aspectj load-time weaving.
+
+# usage:         sh ./javamop <monitored property> <benchmark>
+
+# example usage: sh ./javamop SafeMapIterator avrora
+#                sh ./javamop SafeMapIterator "h2 --converge"
+#                sh ./javamop SafeIterator eclipse
+
+# list of all monitored properties can be found in target/jars/mop; each jar is property
+# list of all benchmarks can be found at http://dacapobench.org/benchmarks.html 
+
+# remember directory where this script is called
+DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
+
+# get and process classpath from maven pom
+mvn -q dependency:build-classpath -Dmdep.outputFile=dependency-outputfile
+tr ':' '\n' < dependency-outputfile > dependency-list
+
+# get classpaths to local maven repo
+AJC=$(grep "aspectjtools" dependency-list)
+RT=$(grep "aspectjrt" dependency-list)
+WEAVER=$(grep "aspectjweaver" dependency-list)
+
+# cleanup tempfiles
+rm dependency-outputfile dependency-list
+
+# create working and target directories
+mkdir -p target/classes/META-INF target/jars/mop target/jars/prm4j
+
+# compile the aspect into classes
+echo "Compiling aspect..."
+java -jar $AJC -cp ${RT}:lib/javamoprt.jar src/main/java/mop/* -d target/classes -6
+
+# create custom aop-ajc.xml and put in META-INF
+sed 's/<aspectname>/mop.'$1'MonitorAspect/g' src/main/resources/mop/aop-ajc.xml > target/classes/META-INF/aop-ajc.xml
+
+# repackage each aspect into a single jars with the custom aop-ajc.xml
+jar cf target/jars/mop/$1.jar -C target/classes META-INF/aop-ajc.xml -C target/classes mop/$1Monitor.class -C target/classes mop/$1Monitor_Set.class -C target/classes mop/$1MonitorAspect.class
+
+# cleanup custom aop-ajc.xml
+rm target/classes/META-INF/aop-ajc.xml
+
+# load-time weaving via aspectjweaver
+echo "Starting benchmark with aspectj load-time weaving..."
+java -Xms256M -Xmx1024M -javaagent:${WEAVER} -Xbootclasspath/a:${RT}:${DIR}/lib/javamoprt.jar:${DIR}/target/jars/mop/$1.jar -jar lib/dacapo-9.12-bach.jar $2

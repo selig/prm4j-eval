@@ -276,6 +276,7 @@ public aspect UnsafeIteratorMonitorAspect implements javamoprt.MOPObject {
 	public UnsafeIteratorMonitorAspect(){
 		UnsafeIteratorMapManager = new javamoprt.map.MOPMapManager();
 		UnsafeIteratorMapManager.start();
+		System.out.println("Started JavaMOP UnsafeIteratorMonitorAspect");
 	}
 
 	// Declarations for the Lock
