@@ -16,4 +16,4 @@ ajc -cp $CLASSPATH:lib/javamoprt.jar src/mop/* -d bin -6
 sh makejars.sh 
 
 # load-time weaving via aspectjweaver 1.6.12
-java -Xms256M -Xmx1024M -javaagent:lib/aspectjweaver.jar -Xbootclasspath/a:aspectjrt.jar:lib/javamoprt.jar:lib/mop/$1.jar -jar lib/dacapo-9.12-bach.jar $2 --converge
+java -Xms256M -Xmx1024M -javaagent:lib/aspectjweaver.jar -Xbootclasspath/a:aspectjrt.jar:lib/javamoprt.jar:lib/mop/$1.jar -jar lib/dacapo-9.12-bach.jar $2
