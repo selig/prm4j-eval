@@ -1,0 +1,52 @@
+#!/usr/bin/env bash
+
+# Compiles and runs JavaMOP aspects with the DaCapo-9.12-bach benchmark using aspectj load-time weaving.
+
+# usage:         ./prm4j <monitored property> <benchmark>
+
+# example usage: ./prm4j SafeMapIterator avrora
+#                ./prm4j SafeMapIterator "h2 --converge"
+#                ./prm4j SafeIterator eclipse
+
+# list of all monitored properties can be found in target/jars/prm4j; each jar is property
+# list of all benchmarks can be found at http://dacapobench.org/benchmarks.html 
+
+# remember directory where this script is called
+DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
+
+echo "Resolving maven dependencies..."
+mvn -q dependency:resolve --update-snapshots
+
+# get and process classpath from maven pom
+mvn -q dependency:build-classpath -Dmdep.outputFile=dependency-outputfile -DincludeArtifactIds=prm4j,guava,aspectjtools,aspectjweaver,aspectjrt
+tr ':' '\n' < dependency-outputfile > dependency-list
+
+# get classpaths to local maven repo
+AJC=$(grep "aspectjtools" dependency-list)
+RT=$(grep "aspectjrt" dependency-list)
+WEAVER=$(grep "aspectjweaver" dependency-list)
+PRM4J=$(grep "prm4j" dependency-list)
+GUAVA=$(grep "guava" dependency-list)
+
+# cleanup tempfiles
+rm dependency-outputfile dependency-list
+
+# create working and target directories
+mkdir -p target/classes/META-INF target/jars/prm4j
+
+# compile the aspect into classes
+echo "Compiling aspect..."
+java -jar $AJC -cp $GUAVA:$PRM4J:$RT src/main/java/prm4j/* -d target/classes -6
+
+# create custom aop-ajc.xml and put in META-INF
+sed 's/<aspectname>/prm4j.'$1'/g' src/main/resources/prm4j/aop-ajc.xml > target/classes/META-INF/aop-ajc.xml
+
+# repackage each aspect into a single jars with the custom aop-ajc.xml
+jar cf target/jars/prm4j/$1.jar -C target/classes META-INF/aop-ajc.xml -C target/classes prm4j/$1.class -C target/classes prm4j/FSM_$1.class
+
+# cleanup custom aop-ajc.xml
+rm target/classes/META-INF/aop-ajc.xml
+
+# load-time weaving via aspectjweaver
+echo "Starting benchmark [prm4j:$1:$2]..."
+java -Xms256M -Xmx1024M -javaagent:${WEAVER} -Xbootclasspath/a:$GUAVA:$PRM4J:$RT:${DIR}/target/jars/prm4j/$1.jar -jar $DACAPO $2
