@@ -14,6 +14,9 @@
 # remember directory where this script is called
 DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
 
+echo "Resolving maven dependencies..."
+mvn -q dependency:resolve --update-snapshots
+
 # get and process classpath from maven pom
 mvn -q dependency:build-classpath -Dmdep.outputFile=dependency-outputfile
 tr ':' '\n' < dependency-outputfile > dependency-list
