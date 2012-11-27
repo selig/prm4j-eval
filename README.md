@@ -10,7 +10,10 @@ Although this is a maven project, it is not necessary to `mvn compile` or `mvn i
 	* If it does not exist, download it [here][4] (ca. 167 MB)
 	* Add `export DACAPO=path/to/dacapo-9.12-bach.jar` to your profile or execute it in the local shell
 	* Test DaCapo by running `./dacapo avrora`, which should start the benchmark instantly
-* Run an monitoring aspect with JavaMOP in the form `./javamop <aspectname> <benchmark>`, e.g. `./javamop SafeMapIterator avrora`
+* Run a monitoring aspect with
+	* JavaMOP by executing `./javamop <aspectname> <benchmark>`, e.g. `./javamop SafeMapIterator avrora`
+	* prm4j by executing `./prm4j <aspectname> <benchmark>`, e.g. `./prm4j SafeMapIterator avrora`
+* Optional: Run a configured evaluation by executing `./eval`
  `
 
 You **don't** need to have [AspectJ][5] installed, the necessary dependencies are retrieved via maven.
