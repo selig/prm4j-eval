@@ -46,5 +46,5 @@ jar cf target/jars/mop/$1.jar -C target/classes META-INF/aop-ajc.xml -C target/c
 rm target/classes/META-INF/aop-ajc.xml
 
 # load-time weaving via aspectjweaver
-echo "Starting benchmark with aspectj load-time weaving..."
+echo "Starting benchmark [JavaMOP:$1:$2]..."
 java -Xms256M -Xmx1024M -javaagent:${WEAVER} -Xbootclasspath/a:${RT}:${DIR}/lib/javamoprt.jar:${DIR}/target/jars/mop/$1.jar -jar $DACAPO $2
