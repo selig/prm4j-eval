@@ -78,6 +78,13 @@
 			<version>${aspectj.version}</version>
 			<scope>compile</scope>
 		</dependency>
+		<dependency>
+			<groupId>edu.uiuc.cs.fsl</groupId>
+			<artifactId>javamoprt</artifactId>
+			<version>3.0.0</version>
+			<scope>system</scope>
+			<systemPath>${basedir}/lib/javamoprt.jar</systemPath>
+		</dependency>
 	</dependencies>
 
 </project>
