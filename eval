@@ -1,0 +1,18 @@
+#!/usr/bin/env bash
+
+# TODO refactor
+
+echo "global evaluation settings: --converge --no-validation"
+
+./prm4j UnsafeIterator "avrora --converge --no-validation"
+./prm4j UnsafeIterator "h2 --converge --no-validation"
+./prm4j UnsafeIterator "eclipse --converge --no-validation"
+./javamop UnsafeIterator "avrora --converge --no-validation"
+./javamop UnsafeIterator "h2 --converge --no-validation"
+./javamop UnsafeIterator "eclipse --converge --no-validation"
+./prm4j UnsafeMapIterator "avrora --converge --no-validation"
+./prm4j UnsafeMapIterator "h2 --converge --no-validation"
+./prm4j UnsafeMapIterator "eclipse --converge --no-validation"
+./javamop UnsafeMapIterator "avrora --converge --no-validation"
+./javamop UnsafeMapIterator "h2 --converge --no-validation"
+./javamop UnsafeMapIterator "eclipse --converge --no-validation"
