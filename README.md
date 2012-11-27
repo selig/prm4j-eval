@@ -4,17 +4,18 @@ Evaluation environment to measure and compare the performance of [prm4j][1] and 
 
 ##Usage
 
-To run an an monitoring aspect with JavaMOP, run `./javamop <aspectname> <benchmark>`, e.g. `./javamop SafeMapIterator avrora`
+Although this is a maven project, it is not necessary to `mvn compile` or `mvn install` it. Maven is used in the background for dependency resolution. Just follow this instructions to get it running:
 
-##Prerequisites
+* `dacapo-9.12-bach.jar` has to exist locally and the location has to be known to prm4j-eval.
+	* If it does not exist, download it [here][4] (ca. 167 MB)
+	* Add `export DACAPO=path/to/dacapo-9.12-bach.jar` to your profile or execute it in the local shell
+	* Test DaCapo by running `./dacapo avrora`, which should start the benchmark instantly
+* Run an monitoring aspect with JavaMOP in the form `./javamop <aspectname> <benchmark>`, e.g. `./javamop SafeMapIterator avrora`
+ `
 
- `dacapo-9.12-bach.jar` has to exist somewhere on your disk. If not, you can download it [here][4] (ca. 167 MB). 
-  Let prm4j-eval find it by executing `export DACAPO=path/to/dacapo-9.12-bach.jar` before usage.
-  To see if DaCapo can be found and works, run `./dacapo avrora`, which should start the benchmark instantly.
+You **don't** need to have [AspectJ][5] installed, the necessary dependencies are retrieved via maven.
 
-  You **don't** need to have [AspectJ][5] installed, the necessary dependencies are retrieved via Maven.
-
-  (The only dependency included in the lib is the 'javamoprt.jar' because no public maven repository seems to exist containing it.)
+The only system dependency included in the lib is the 'javamoprt.jar' because no public maven repository seems to exist containing it.
 
 ---
 
