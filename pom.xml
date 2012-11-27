@@ -10,7 +10,7 @@
 	<properties>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 		<java.version>1.6</java.version>
-		<aspectj.version>1.6.12</aspectj.version>
+		<aspectj.version>1.7.0</aspectj.version>
 	</properties>
 
 	<repositories>
@@ -43,6 +43,13 @@
 						</goals>
 					</execution>
 				</executions>
+				<dependencies>
+					<dependency>
+						<groupId>org.aspectj</groupId>
+						<artifactId>aspectjtools</artifactId>
+						<version>${aspectj.version}</version>
+					</dependency>
+				</dependencies>
 				<configuration>
 					<complianceLevel>${java.version}</complianceLevel>
 					<source>${maven.compiler.source}</source>
