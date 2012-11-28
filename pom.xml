@@ -15,6 +15,10 @@
 
 	<repositories>
 		<repository>
+			<id>parzonka.github.com-releases</id>
+			<url>http://parzonka.github.com/mvn-repo/releases</url>
+		</repository>
+		<repository>
 			<id>parzonka.github.com-snapshots</id>
 			<url>http://parzonka.github.com/mvn-repo/snapshots</url>
 		</repository>
@@ -88,8 +92,7 @@
 			<groupId>edu.uiuc.cs.fsl</groupId>
 			<artifactId>javamoprt</artifactId>
 			<version>3.0.0</version>
-			<scope>system</scope>
-			<systemPath>${basedir}/lib/javamoprt.jar</systemPath>
+			<scope>compile</scope>
 		</dependency>
 	</dependencies>
 

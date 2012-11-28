@@ -25,6 +25,7 @@ tr ':' '\n' < dependency-outputfile > dependency-list
 AJC=$(grep "aspectjtools" dependency-list)
 RT=$(grep "aspectjrt" dependency-list)
 WEAVER=$(grep "aspectjweaver" dependency-list)
+JAVAMOPRT=$(grep "javamoprt" dependency-list)
 
 # cleanup tempfiles
 rm dependency-outputfile dependency-list
@@ -34,7 +35,7 @@ mkdir -p target/classes/META-INF target/jars/mop target/jars/prm4j
 
 # compile the aspect into classes
 echo "Compiling aspect..."
-java -jar $AJC -cp ${RT}:lib/javamoprt.jar src/main/java/mop/* -d target/classes -6
+java -jar $AJC -cp ${RT}:${JAVAMOPRT} src/main/java/mop/* -d target/classes -6
 
 # create custom aop-ajc.xml and put in META-INF
 sed 's/<aspectname>/mop.'$1'MonitorAspect/g' src/main/resources/mop/aop-ajc.xml > target/classes/META-INF/aop-ajc.xml
@@ -47,4 +48,4 @@ rm target/classes/META-INF/aop-ajc.xml
 
 # load-time weaving via aspectjweaver
 echo "Starting benchmark [JavaMOP:$1:$2]..."
-java -Xms256M -Xmx1024M -javaagent:${WEAVER} -Xbootclasspath/a:${RT}:${DIR}/lib/javamoprt.jar:${DIR}/target/jars/mop/$1.jar -jar $DACAPO $2
+java -Xms256M -Xmx1024M -javaagent:${WEAVER} -Xbootclasspath/a:${RT}:${JAVAMOPRT}:${DIR}/target/jars/mop/$1.jar -jar $DACAPO $2
