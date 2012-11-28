@@ -8,5 +8,16 @@
 
 # list of all benchmarks can be found at http://dacapobench.org/benchmarks.html 
 
+echo "Resolving maven dependencies... (may take a while)"
+mvn -q dependency:resolve --update-snapshots
+
+# get and process classpath from maven pom
+mvn -q dependency:build-classpath -Dmdep.outputFile=dependency-outputfile -DincludeArtifactIds=dacapo
+tr ':' '\n' < dependency-outputfile > dependency-list
+DACAPO=$(grep "dacapo" dependency-list)
+
+# cleanup tempfiles
+rm dependency-outputfile dependency-list
+
 # load-time weaving via aspectjweaver 1.6.12
 java -Xms256M -Xmx1024M -jar ${DACAPO} $1

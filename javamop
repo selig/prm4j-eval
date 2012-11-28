@@ -12,9 +12,10 @@
 # list of all benchmarks can be found at http://dacapobench.org/benchmarks.html 
 
 # remember directory where this script is called
+# (some benchmarks need absolute paths)
 DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
 
-echo "Resolving maven dependencies..."
+echo "Resolving maven dependencies... (may take a while)"
 mvn -q dependency:resolve --update-snapshots
 
 # get and process classpath from maven pom
@@ -26,6 +27,7 @@ AJC=$(grep "aspectjtools" dependency-list)
 RT=$(grep "aspectjrt" dependency-list)
 WEAVER=$(grep "aspectjweaver" dependency-list)
 JAVAMOPRT=$(grep "javamoprt" dependency-list)
+DACAPO=$(grep "dacapo" dependency-list)
 
 # cleanup tempfiles
 rm dependency-outputfile dependency-list

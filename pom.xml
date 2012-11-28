@@ -83,6 +83,12 @@
 			<scope>compile</scope>
 		</dependency>
 		<dependency>
+			<groupId>org.dacapobench</groupId>
+			<artifactId>dacapo</artifactId>
+			<version>9.12-bach</version>
+			<scope>compile</scope>
+		</dependency>
+		<dependency>
 			<groupId>com.github.parzonka</groupId>
 			<artifactId>prm4j</artifactId>
 			<version>0.0.1-SNAPSHOT</version>
