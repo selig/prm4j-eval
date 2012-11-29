@@ -15,7 +15,7 @@
 # (some benchmarks need absolute paths)
 DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
 
-echo "Resolving maven dependencies..."
+echo "Resolving maven dependencies... (may take a while)"
 mvn -q dependency:resolve --update-snapshots
 
 # get and process classpath from maven pom
@@ -37,7 +37,7 @@ rm dependency-outputfile dependency-list
 mkdir -p target/classes/META-INF target/jars/prm4j
 
 # compile the aspect into classes
-echo "Compiling aspect... (may take a while)"
+echo "Compiling aspect..."
 java -jar $AJC -cp $GUAVA:$PRM4J:$RT src/main/java/prm4j/* -d target/classes -6
 
 # create custom aop-ajc.xml and put in META-INF
