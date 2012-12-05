@@ -5,6 +5,7 @@
 	</aspects>
 	<weaver>
 		<exclude within="mop..*" />
+		<exclude within="prm4jeval..*" />
 		<exclude within="org.apache.commons..*" />
 		<exclude within="org.dacapo..*" />
 		<exclude within="org.netbeans.lib.profiler..*" />

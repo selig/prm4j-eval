@@ -38,7 +38,7 @@ mkdir -p target/classes/META-INF target/jars/prm4j
 
 # compile the aspect into classes
 echo "Compiling aspect..."
-java -jar $AJC -cp $GUAVA:$PRM4J:$RT src/main/java/prm4j/* -d target/classes -6
+java -jar $AJC -cp $GUAVA:$PRM4J:$RT:$DACAPO src/main/java/prm4j/* -d target/classes -6
 
 # create custom aop-ajc.xml and put in META-INF
 sed 's/<aspectname>/prm4j.'$1'/g' src/main/resources/prm4j/aop-ajc.xml > target/classes/META-INF/aop-ajc.xml
@@ -47,12 +47,12 @@ sed 's/<aspectname>/prm4j.'$1'/g' src/main/resources/prm4j/aop-ajc.xml > target/
 jar cf target/jars/prm4j/$1.jar -C target/classes META-INF/aop-ajc.xml -C target/classes prm4j/$1.class -C target/classes prm4j/FSM_$1.class
 
 # create jar with callback
-javac src/main/java/EvalCallback.java -d target/classes -cp $DACAPO
-jar cf target/jars/Callback.jar -C target/classes EvalCallback.class
+javac src/main/java/prm4jeval/EvalCallback.java -d target/classes -cp $DACAPO
+jar cf target/jars/Callback.jar -C target/classes prm4jeval/EvalCallback.class
 
 # cleanup custom aop-ajc.xml
 rm target/classes/META-INF/aop-ajc.xml
 
 # load-time weaving via aspectjweaver
 echo "Starting benchmark [prm4j:$1:$2]..."
-java -Xms256M -Xmx1024M -javaagent:${WEAVER} -Xbootclasspath/a:$GUAVA:$PRM4J:$RT:${DIR}/target/jars/prm4j/$1.jar -cp $DACAPO:target/jars/Callback.jar Harness -c EvalCallback $2
+java -Xms256M -Xmx1024M -javaagent:${WEAVER} -Xbootclasspath/a:$RT -cp $DACAPO:$GUAVA:$PRM4J:${DIR}/target/jars/prm4j/$1.jar:${DIR}/target/jars/Callback.jar Harness -c prm4jeval.EvalCallback $2
