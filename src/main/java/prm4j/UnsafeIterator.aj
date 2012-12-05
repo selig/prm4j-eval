@@ -18,6 +18,7 @@ import org.aspectj.lang.annotation.SuppressAjWarnings;
 import prm4j.api.ParametricMonitor;
 import prm4j.api.ParametricMonitorFactory;
 import prm4j.api.fsm.FSMSpec;
+import org.dacapo.harness.Callback;
 
 @SuppressWarnings("rawtypes")
 @SuppressAjWarnings({ "adviceDidNotMatch" })
@@ -29,7 +30,7 @@ public aspect UnsafeIterator {
     public UnsafeIterator() {
 	fsm = new FSM_UnsafeIterator();
 	pm = ParametricMonitorFactory.createParametricMonitor(new FSMSpec(fsm.fsm));
-	System.out.println("prm4j: Parametric monitor for 'UnsafeIterator' created!");
+	System.out.println("[prm4j.UnsafeIterator] Created!");
     }
 
     pointcut UnsafeIterator_create(Collection c) : (call(Iterator Collection+.iterator()) && target(c)) && !within(prm4j..*) && !within(org.dacapo..*);
@@ -48,6 +49,15 @@ public aspect UnsafeIterator {
 
     before(Iterator i) : UnsafeIterator_next(i) {
 	pm.processEvent(fsm.next.createEvent(i));
+    }
+
+    before() : call (* Callback+.start(String)) {
+	System.out.println("[prm4j.UnsafeIterator] Starting...");
+    }
+
+    before() : call (* Callback+.stop()) {
+	System.out.println("[prm4j.UnsafeIterator] Stopping and resetting...");
+	pm.reset();
     }
 
 }
