@@ -19,7 +19,7 @@ echo "Resolving maven dependencies... (may take a while)"
 mvn -q dependency:resolve --update-snapshots
 
 # get and process classpath from maven pom
-mvn -q dependency:build-classpath -Dmdep.outputFile=dependency-outputfile -DincludeArtifactIds=prm4j,guava,aspectjtools,aspectjweaver,aspectjrt,dacapo
+mvn -q dependency:build-classpath -Dmdep.outputFile=dependency-outputfile
 tr ':' '\n' < dependency-outputfile > dependency-list
 
 # get classpaths to local maven repo
@@ -28,6 +28,7 @@ RT=$(grep "aspectjrt" dependency-list)
 WEAVER=$(grep "aspectjweaver" dependency-list)
 PRM4J=$(grep "prm4j" dependency-list)
 GUAVA=$(grep "guava" dependency-list)
+APACHEMATH=$(grep "math3" dependency-list)
 DACAPO=$(grep "dacapo" dependency-list)
 
 # cleanup tempfiles
@@ -47,12 +48,25 @@ sed 's/<aspectname>/prm4j.'$1'/g' src/main/resources/prm4j/aop-ajc.xml > target/
 jar cf target/jars/prm4j/$1.jar -C target/classes META-INF/aop-ajc.xml -C target/classes prm4j/$1.class -C target/classes prm4j/FSM_$1.class
 
 # create jar with callback
-javac src/main/java/prm4jeval/EvalCallback.java -d target/classes -cp $DACAPO
-jar cf target/jars/Callback.jar -C target/classes prm4jeval/EvalCallback.class
+javac src/main/java/prm4jeval/* -d target/classes -cp $DACAPO:$APACHEMATH:$GUAVA
+jar cf target/jars/Callback.jar -C target/classes .
 
 # cleanup custom aop-ajc.xml
 rm target/classes/META-INF/aop-ajc.xml
 
 # load-time weaving via aspectjweaver
-echo "Starting benchmark [prm4j:$1:$2]..."
-java -Xms256M -Xmx1024M -javaagent:${WEAVER} -Xbootclasspath/a:$RT -cp $DACAPO:$GUAVA:$PRM4J:${DIR}/target/jars/prm4j/$1.jar:${DIR}/target/jars/Callback.jar Harness -c prm4jeval.EvalCallback $2
+for benchmark in avrora h2; do
+	for i in {1..15}; do
+	STATUS=0
+		while [ $STATUS -eq 0 ]; do
+    		echo "Starting benchmark [prm4j:$benchmark:$2] measurement $i..."
+			java -Xms256M -Xmx1024M -javaagent:${WEAVER} -Xbootclasspath/a:$RT \
+				-Dprm4jeval.benchmark=$benchmark -Dprm4jeval.parametricProperty=$1 \
+				-cp $DACAPO:$GUAVA:$PRM4J:$APACHEMATH:${DIR}/target/jars/prm4j/$1.jar:${DIR}/target/jars/Callback.jar \
+				Harness -c prm4jeval.EvalCallback $benchmark
+			STATUS=$?
+		done
+	done
+done 
+
+
