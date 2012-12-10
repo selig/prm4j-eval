@@ -61,6 +61,7 @@ for benchmark in avrora h2; do
 		while [ $STATUS -eq 0 ]; do
     		echo "Starting benchmark [prm4j:$benchmark:$2] measurement $i..."
 			java -Xms256M -Xmx1024M -javaagent:${WEAVER} -Xbootclasspath/a:$RT \
+				-Dprm4jeval.outputfile=results/prm4j.ser \
 				-Dprm4jeval.benchmark=$benchmark -Dprm4jeval.parametricProperty=$1 \
 				-cp $DACAPO:$GUAVA:$PRM4J:$APACHEMATH:${DIR}/target/jars/prm4j/$1.jar:${DIR}/target/jars/Callback.jar \
 				Harness -c prm4jeval.EvalCallback $benchmark

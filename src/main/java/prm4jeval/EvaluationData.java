@@ -25,7 +25,7 @@ public class EvaluationData {
 
     private final static String[] benchmarks = { "avrora", "batik", "eclipse", "fop", "h2", "luindex", "lusearch",
 	    "pmd", "sunflow", "tomcat", "tradebeans", "tradesoap", "xalan" };
-    private final static String[] parametricProperties = { "hasNext", "UnsafeIterator", "UnsafeMapIter",
+    private final static String[] parametricProperties = { "Pure", "HasNext", "UnsafeIterator", "UnsafeMapIter",
 	    "UnsafeSyncColl", "UnsafeSyncMap" };
 
     private final String filePath;

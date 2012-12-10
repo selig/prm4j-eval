@@ -17,7 +17,7 @@ public class EvalCallback extends Callback {
 
     public EvalCallback(CommandLineArgs args) {
 	super(args);
-	evaluationData = new EvaluationData("evaluationData.ser");
+	evaluationData = new EvaluationData(System.getProperty("prm4jeval.outputfile"));
 	sse = evaluationData.getSteadyStateEvalation(System.getProperty("prm4jeval.benchmark"),
 		System.getProperty("prm4jeval.parametricProperty"));
 	System.out.println("EvalCallback loaded." + Arrays.toString(args.getArgs()));
@@ -56,7 +56,7 @@ public class EvalCallback extends Callback {
 	if (sse.getCurrentInvocation().isThresholdReached()) {
 	    sse.closeCurrentInvocation();
 	    evaluationData.storeEvaluationData();
-	    System.out.println("[prm4jeval] Threshold reached after " + iterationCount + "iterations , exiting!");
+	    System.out.println("[prm4jeval] Threshold reached after " + iterationCount + " iterations , exiting!");
 	    System.exit(1);
 	}
 	return true;
