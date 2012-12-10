@@ -49,12 +49,15 @@ public class ConfidenceInterval implements Serializable {
     }
 
     /**
-     * Returns the width of the interval spanning around the mean. If c1 and c2 are the interval limits, the width is |c2
-     * - c1|.
+     * Returns the width of the interval spanning around the mean. If c1 and c2 are the interval limits, the width is
+     * |c2 - c1|.
      *
      * @return the width of this confidence interval
      */
     public double getWidth() {
+	if (measurements.getN() < 2) {
+	    return Double.NaN;
+	}
 	return getConfidenceIntervalWidth(measurements, significance);
     }
 
