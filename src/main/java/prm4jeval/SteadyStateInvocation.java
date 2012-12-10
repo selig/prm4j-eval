@@ -23,6 +23,7 @@ public class SteadyStateInvocation implements Serializable {
      */
     protected final double covThreshold;
     protected final int window;
+    protected int iteration;
     private final DescriptiveStatistics measurements;
 
     public SteadyStateInvocation(int window, double covThreshold) {
@@ -57,7 +58,12 @@ public class SteadyStateInvocation implements Serializable {
 	double coefficientOfStandardDeviation = standardDeviation / mean;
 	System.out.println("Coefficient of standard deviation is: " + coefficientOfStandardDeviation);
 	if (coefficientOfStandardDeviation < covThreshold) {
-	    System.out.println("Reached");
+	    System.out.println("Reached cov-threshold!");
+	    return true;
+	}
+	if (iteration++ >= 25) {
+	    System.out.println("Performed 25 iterations, proceeding with cov=" + coefficientOfStandardDeviation
+		    + " and mean of last " + window + " measurements: " + measurements.getMean());
 	    return true;
 	}
 	return false;
