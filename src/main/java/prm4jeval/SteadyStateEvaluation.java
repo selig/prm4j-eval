@@ -31,6 +31,10 @@ public class SteadyStateEvaluation implements Serializable {
 	return steadyStateInvocation;
     }
 
+    public ConfidenceInterval getConfidenceInterval() {
+	return confidenceInterval;
+    }
+
     public void closeCurrentInvocation() {
 	confidenceInterval.addMeasurement(steadyStateInvocation.getMean());
 	steadyStateInvocation = new SteadyStateInvocation();

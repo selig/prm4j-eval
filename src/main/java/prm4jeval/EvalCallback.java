@@ -54,9 +54,13 @@ public class EvalCallback extends Callback {
     public boolean runAgain() {
 	evaluationData.storeEvaluationData();
 	if (sse.getCurrentInvocation().isThresholdReached()) {
+	    double mean = sse.getConfidenceInterval().getMean();
+	    double width = sse.getConfidenceInterval().getWidth();
 	    sse.closeCurrentInvocation();
 	    evaluationData.storeEvaluationData();
-	    System.out.println("[prm4jeval] Threshold reached after " + iterationCount + " iterations , exiting!");
+	    System.out.println("[prm4jeval] Threshold reached after " + iterationCount
+		    + " iterations. Current mean is " + mean + " with confidence interval width " + width
+		    + ", exiting!");
 	    System.exit(1);
 	}
 	return true;
