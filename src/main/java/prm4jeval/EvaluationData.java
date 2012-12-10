@@ -29,7 +29,7 @@ public class EvaluationData {
 	    "UnsafeSyncColl", "UnsafeSyncMap" };
 
     private final String filePath;
-    private final ArrayTable<String, String, SteadyStateInvocation> data;
+    private final ArrayTable<String, String, SteadyStateEvaluation> data;
 
     /**
      * @param filePath
@@ -57,20 +57,20 @@ public class EvaluationData {
 	return data.columnKeySet();
     }
 
-    public SteadyStateInvocation getInvocation(String benchmark, String parametricProperty) {
+    public SteadyStateEvaluation getSteadyStateEvalation(String benchmark, String parametricProperty) {
 	if (!getBenchmarks().contains(benchmark))
 	    throw new IllegalArgumentException("Benchmark not known: " + benchmark);
 	if (!getParametricProperties().contains(parametricProperty))
 	    throw new IllegalArgumentException("Parametric property not known: " + parametricProperty);
-	SteadyStateInvocation invocation = data.get(benchmark, parametricProperty);
-	if (invocation == null) {
-	    invocation = new SteadyStateInvocation();
-	    data.put(benchmark, parametricProperty, invocation);
-	    System.out.println("[prm4jeval] Created data for invocation: " + benchmark + "-" + parametricProperty);
+	SteadyStateEvaluation sse = data.get(benchmark, parametricProperty);
+	if (sse == null) {
+	    sse = new SteadyStateEvaluation();
+	    data.put(benchmark, parametricProperty, sse);
+	    System.out.println("[prm4jeval] Beginning evaluation of " + benchmark + "-" + parametricProperty);
 	} else {
-	    System.out.println("[prm4jeval] Retrieved data for invocation: " + benchmark + "-" + parametricProperty);
+	    System.out.println("[prm4jeval] Continuing evaluation of " + benchmark + "-" + parametricProperty);
 	}
-	return invocation;
+	return sse;
     }
 
     public void storeEvaluationData() {
@@ -78,8 +78,8 @@ public class EvaluationData {
     }
 
     @SuppressWarnings("unchecked")
-    public ArrayTable<String, String, SteadyStateInvocation> loadEvaluationData() {
-	return (ArrayTable<String, String, SteadyStateInvocation>) SerializationUtils.deserializeFromFile(filePath);
+    public ArrayTable<String, String, SteadyStateEvaluation> loadEvaluationData() {
+	return (ArrayTable<String, String, SteadyStateEvaluation>) SerializationUtils.deserializeFromFile(filePath);
     }
 
 }
