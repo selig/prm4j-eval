@@ -10,6 +10,8 @@
  */
 package prm4jeval;
 
+import java.io.Serializable;
+
 import org.apache.commons.math3.distribution.RealDistribution;
 import org.apache.commons.math3.distribution.TDistribution;
 import org.apache.commons.math3.stat.descriptive.StatisticalSummary;
@@ -20,7 +22,9 @@ import com.google.common.primitives.Ints;
 /**
  * Calculates the confidence interval based on Student's t-distribution.
  */
-public class ConfidenceInterval {
+public class ConfidenceInterval implements Serializable {
+
+    private static final long serialVersionUID = -6517007283853394393L;
 
     private SummaryStatistics measurements = new SummaryStatistics();
     private final double significance;
