@@ -63,7 +63,7 @@ for i in {0..15}; do
 					-Dprm4jeval.outputfile=results/javamop.ser \
 					-Dprm4jeval.benchmark=$benchmark -Dprm4jeval.parametricProperty=$paramProperty \
 					-cp $DACAPO:$GUAVA:$JAVAMOPRT:$APACHEMATH:${DIR}/target/jars/mop/$paramProperty.jar:${DIR}/target/jars/Callback.jar \
-					Harness -c prm4jeval.EvalCallback $benchmark
+					Harness --no-validation -c prm4jeval.EvalCallback $benchmark
 				STATUS=$?
 			done
 		done
