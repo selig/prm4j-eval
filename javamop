@@ -1,14 +1,10 @@
 #!/usr/bin/env bash
-
+#
 # Compiles and runs JavaMOP aspects with the DaCapo-9.12-bach benchmark using aspectj load-time weaving.
-
-# usage:         ./javamop <monitored property> <benchmark>
-
-# example usage: ./javamop SafeMapIterator avrora
-#                ./javamop SafeMapIterator "h2 --converge"
-#                ./javamop SafeIterator eclipse
-
-# list of all monitored properties can be found in target/jars/mop; each jar is property
+#
+# usage:         ./javamop
+#
+# list of all monitored properties can be found in target/jars/mop; each jar is a property
 # list of all benchmarks can be found at http://dacapobench.org/benchmarks.html 
 
 # remember directory where this script is called
@@ -27,6 +23,8 @@ AJC=$(grep "aspectjtools" dependency-list)
 RT=$(grep "aspectjrt" dependency-list)
 WEAVER=$(grep "aspectjweaver" dependency-list)
 JAVAMOPRT=$(grep "javamoprt" dependency-list)
+GUAVA=$(grep "guava" dependency-list)
+APACHEMATH=$(grep "math3" dependency-list)
 DACAPO=$(grep "dacapo" dependency-list)
 
 # cleanup tempfiles
@@ -37,17 +35,37 @@ mkdir -p target/classes/META-INF target/jars/mop target/jars/prm4j
 
 # compile the aspect into classes
 echo "Compiling aspect..."
-java -jar $AJC -cp ${RT}:${JAVAMOPRT} src/main/java/mop/* -d target/classes -6
+java -jar $AJC -cp ${RT}:${JAVAMOPRT}:$DACAPO:$GUAVA src/main/java/mop/* -d target/classes -6
 
-# create custom aop-ajc.xml and put in META-INF
-sed 's/<aspectname>/mop.'$1'MonitorAspect/g' src/main/resources/mop/aop-ajc.xml > target/classes/META-INF/aop-ajc.xml
+# create jar with callback
+javac src/main/java/prm4jeval/* -d target/classes -cp $DACAPO:$APACHEMATH:$GUAVA
+jar cf target/jars/Callback.jar -C target/classes .
 
-# repackage each aspect into a single jars with the custom aop-ajc.xml
-jar cf target/jars/mop/$1.jar -C target/classes META-INF/aop-ajc.xml -C target/classes mop/$1Monitor.class -C target/classes mop/$1Monitor_Set.class -C target/classes mop/$1MonitorAspect.class
+# load-time weaving via aspectjweaver, run for 16 iterations
+for i in {0..15}; do
+	for paramProperty in HasNext UnsafeIterator UnsafeMapIterator SafeSyncCollection SafeSyncMap ; do
+		
+		# create custom aop-ajc.xml and put in META-INF
+		sed 's/<aspectname>/mop.'$paramProperty'MonitorAspect/g' src/main/resources/mop/aop-ajc.xml > target/classes/META-INF/aop-ajc.xml
 
-# cleanup custom aop-ajc.xml
-rm target/classes/META-INF/aop-ajc.xml
+		# repackage each aspect into a single jars with the custom aop-ajc.xml
+		jar cf target/jars/mop/${paramProperty}.jar -C target/classes META-INF/aop-ajc.xml -C target/classes mop/${paramProperty}Monitor.class -C target/classes mop/${paramProperty}Monitor_Set.class -C target/classes mop/${paramProperty}MonitorAspect.class
 
-# load-time weaving via aspectjweaver
-echo "Starting benchmark [JavaMOP:$1:$2]..."
-java -Xms256M -Xmx1024M -javaagent:${WEAVER} -Xbootclasspath/a:${RT}:${JAVAMOPRT}:${DIR}/target/jars/mop/$1.jar -jar $DACAPO $2
+		# cleanup custom aop-ajc.xml
+		rm target/classes/META-INF/aop-ajc.xml
+		
+		for benchmark in avrora batik eclipse fop h2 jython luindex lusearch \
+			pmd sunflow tomcat tradebeans tradesoap xalan ; do
+		STATUS=0
+			while [ $STATUS -eq 0 ]; do
+    			echo "Starting benchmark [javamop:$benchmark:$paramProperty] measurement $i..."
+				java -Xms256M -Xmx2048M -javaagent:${WEAVER} -Xbootclasspath/a:$RT \
+					-Dprm4jeval.outputfile=results/javamop.ser \
+					-Dprm4jeval.benchmark=$benchmark -Dprm4jeval.parametricProperty=$paramProperty \
+					-cp $DACAPO:$GUAVA:$JAVAMOPRT:$APACHEMATH:${DIR}/target/jars/mop/$paramProperty.jar:${DIR}/target/jars/Callback.jar \
+					Harness -c prm4jeval.EvalCallback $benchmark
+				STATUS=$?
+			done
+		done
+	done
+done
