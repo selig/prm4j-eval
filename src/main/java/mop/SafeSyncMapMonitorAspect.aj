@@ -379,7 +379,7 @@ public aspect SafeSyncMapMonitorAspect implements javamoprt.MOPObject {
 	public SafeSyncMapMonitorAspect(){
 		SafeSyncMapMapManager = new javamoprt.map.MOPMapManager();
 		SafeSyncMapMapManager.start();
-		System.out.println("Started JavaMOP SafeSyncMapMonitorAspect");
+		System.out.println("[JavaMOP.SafeSyncMap] Started");
 	}
 
 	// Declarations for the Lock
@@ -935,9 +935,46 @@ public aspect SafeSyncMapMonitorAspect implements javamoprt.MOPObject {
 		}
 	}
 	
-	before() : call (* org.dacapo.harness.Callback+.stop()) {
-		System.out.println("[JavaMOP.HasNext] Stopping and resetting... Reported " + SafeSyncMapMonitor.MATCHES.get() + " violations.");
+	before() : execution (* org.dacapo.harness.Callback+.stop()) {
+		System.out.println("[JavaMOP.SafeSyncMap] Stopping and resetting... Reported " + SafeSyncMapMonitor.MATCHES.get() + " violations.");
 		SafeSyncMapMonitor.MATCHES.set(0); // reset counter
+		
+		SafeSyncMap_timestamp = 1;
+
+		SafeSyncMap_activated = false;
+
+		SafeSyncMap_mapSet_iter_Map = new javamoprt.map.MOPMapOfAll(1);
+		SafeSyncMap_mapSet_iter_Map_cachekey_1 = javamoprt.map.MOPTagRefMap.NULRef;
+		SafeSyncMap_mapSet_iter_Map_cachekey_2 = javamoprt.map.MOPTagRefMap.NULRef;
+		SafeSyncMap_mapSet_iter_Map_cacheset = null;
+		SafeSyncMap_mapSet_iter_Map_cachenode = null;
+		SafeSyncMap_syncMap_Map_cachekey_0 = javamoprt.map.MOPTagRefMap.NULRef;
+		SafeSyncMap_syncMap_Map_cacheset = null;
+		SafeSyncMap_syncMap_Map_cachenode = null;
+		SafeSyncMap_syncMap_mapSet_iter_Map = new javamoprt.map.MOPMapOfAll(0);
+		SafeSyncMap_syncMap_mapSet_iter_Map_cachekey_0 = javamoprt.map.MOPTagRefMap.NULRef;
+		SafeSyncMap_syncMap_mapSet_iter_Map_cachekey_1 = javamoprt.map.MOPTagRefMap.NULRef;
+		SafeSyncMap_syncMap_mapSet_iter_Map_cachekey_2 = javamoprt.map.MOPTagRefMap.NULRef;
+		SafeSyncMap_syncMap_mapSet_iter_Map_cachenode = null;
+		SafeSyncMap_syncMap_mapSet_Map_cachekey_0 = javamoprt.map.MOPTagRefMap.NULRef;
+		SafeSyncMap_syncMap_mapSet_Map_cachekey_1 = javamoprt.map.MOPTagRefMap.NULRef;
+		SafeSyncMap_syncMap_mapSet_Map_cacheset = null;
+		SafeSyncMap_syncMap_mapSet_Map_cachenode = null;
+		SafeSyncMap_iter_Map = new javamoprt.map.MOPMapOfSetMon(2);
+		SafeSyncMap_iter_Map_cachekey_2 = javamoprt.map.MOPTagRefMap.NULRef;
+		SafeSyncMap_iter_Map_cacheset = null;
+		SafeSyncMap_iter_Map_cachenode = null;
+		SafeSyncMap_mapSet__To__syncMap_mapSet_Map = new javamoprt.map.MOPMapOfSetMon(1);
+
+		SafeSyncMap_Iterator_RefMap = new javamoprt.map.MOPTagRefMap();
+		SafeSyncMap_Map_RefMap = new javamoprt.map.MOPTagRefMap();
+		SafeSyncMap_Set_RefMap = new javamoprt.map.MOPTagRefMap();
+		
+		SafeSyncMapMapManager = new javamoprt.map.MOPMapManager();
+		SafeSyncMapMapManager.start();
+		
+		System.gc();
+		System.gc();
 	}
 
 }

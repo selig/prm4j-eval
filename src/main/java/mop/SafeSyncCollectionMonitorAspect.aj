@@ -319,6 +319,7 @@ public aspect SafeSyncCollectionMonitorAspect implements javamoprt.MOPObject {
 	public SafeSyncCollectionMonitorAspect(){
 		SafeSyncCollectionMapManager = new javamoprt.map.MOPMapManager();
 		SafeSyncCollectionMapManager.start();
+		System.out.println("[JavaMOP.SafeSyncCollection] Started"); 
 	}
 
 	// Declarations for the Lock
@@ -640,9 +641,34 @@ public aspect SafeSyncCollectionMonitorAspect implements javamoprt.MOPObject {
 		}
 	}
 	
-	before() : call (* org.dacapo.harness.Callback+.stop()) {
-		System.out.println("[JavaMOP.UnsafeIterator] Stopping and resetting... Reported " + SafeSyncCollectionMonitor.MATCHES.get() + " violations.");
+	before() : execution (* org.dacapo.harness.Callback+.stop()) {
+		System.out.println("[JavaMOP.SafeSyncCollection] Stopping and resetting... Reported " + SafeSyncCollectionMonitor.MATCHES.get() + " violations.");
 		SafeSyncCollectionMonitor.MATCHES.set(0); // reset counter
+		
+		SafeSyncCollection_timestamp = 1;
+
+		SafeSyncCollection_activated = false;
+
+		SafeSyncCollection_c_Map_cachekey_0 = javamoprt.map.MOPTagRefMap.NULRef;
+		SafeSyncCollection_c_Map_cacheset = null;
+		SafeSyncCollection_c_Map_cachenode = null;
+		SafeSyncCollection_c_iter_Map = new javamoprt.map.MOPMapOfAll(0);
+		SafeSyncCollection_c_iter_Map_cachekey_0 = javamoprt.map.MOPTagRefMap.NULRef;
+		SafeSyncCollection_c_iter_Map_cachekey_1 = javamoprt.map.MOPTagRefMap.NULRef;
+		SafeSyncCollection_c_iter_Map_cachenode = null;
+		SafeSyncCollection_iter_Map = new javamoprt.map.MOPMapOfSetMon(1);
+		SafeSyncCollection_iter_Map_cachekey_1 = javamoprt.map.MOPTagRefMap.NULRef;
+		SafeSyncCollection_iter_Map_cacheset = null;
+		SafeSyncCollection_iter_Map_cachenode = null;
+
+		SafeSyncCollection_Iterator_RefMap = new javamoprt.map.MOPTagRefMap();
+		SafeSyncCollection_Object_RefMap = new javamoprt.map.MOPTagRefMap();
+		
+		SafeSyncCollectionMapManager = new javamoprt.map.MOPMapManager();
+		SafeSyncCollectionMapManager.start();
+		
+		System.gc();
+		System.gc();
 	}
 
 }

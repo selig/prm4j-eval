@@ -277,7 +277,7 @@ public aspect UnsafeIteratorMonitorAspect implements javamoprt.MOPObject {
 	public UnsafeIteratorMonitorAspect(){
 		UnsafeIteratorMapManager = new javamoprt.map.MOPMapManager();
 		UnsafeIteratorMapManager.start();
-		System.out.println("Started JavaMOP UnsafeIteratorMonitorAspect");
+		System.out.println("[JavaMOP.UnsafeIterator] Started");
 	}
 
 	// Declarations for the Lock
@@ -499,9 +499,35 @@ public aspect UnsafeIteratorMonitorAspect implements javamoprt.MOPObject {
 		UnsafeIterator_MOPLock.unlock();
 	}
 	
-	before() : call (* org.dacapo.harness.Callback+.stop()) {
+	before() : execution (* org.dacapo.harness.Callback+.stop()) {
 		System.out.println("[JavaMOP.UnsafeIterator] Stopping and resetting... Reported " + UnsafeIteratorMonitor.MATCHES.get() + " violations.");
 		UnsafeIteratorMonitor.MATCHES.set(0); // reset counter
+		
+		UnsafeIterator_timestamp = 1;
+
+		UnsafeIterator_activated = false;
+
+		UnsafeIterator_c_Map_cachekey_0 = javamoprt.map.MOPTagRefMap.NULRef;
+		UnsafeIterator_c_Map_cacheset = null;
+		UnsafeIterator_c_Map_cachenode = null;
+		UnsafeIterator_c_i_Map = new javamoprt.map.MOPMapOfAll(0);
+		UnsafeIterator_c_i_Map_cachekey_0 = javamoprt.map.MOPTagRefMap.NULRef;
+		UnsafeIterator_c_i_Map_cachekey_1 = javamoprt.map.MOPTagRefMap.NULRef;
+		UnsafeIterator_c_i_Map_cachenode = null;
+		UnsafeIterator_i_Map = new javamoprt.map.MOPMapOfSetMon(1);
+		UnsafeIterator_i_Map_cachekey_1 = javamoprt.map.MOPTagRefMap.NULRef;
+		UnsafeIterator_i_Map_cacheset = null;
+		UnsafeIterator_i_Map_cachenode = null;
+
+		UnsafeIterator_Collection_RefMap = new javamoprt.map.MOPTagRefMap();
+		UnsafeIterator_Iterator_RefMap = new javamoprt.map.MOPTagRefMap();
+		
+		UnsafeIteratorMapManager = new javamoprt.map.MOPMapManager();
+		UnsafeIteratorMapManager.start();
+		
+		System.gc();
+		System.gc();
+
 	}
 	
 }

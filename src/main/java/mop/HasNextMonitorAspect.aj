@@ -233,7 +233,7 @@ public aspect HasNextMonitorAspect implements javamoprt.MOPObject {
 	public HasNextMonitorAspect(){
 		HasNextMapManager = new javamoprt.map.MOPMapManager();
 		HasNextMapManager.start();
-		System.out.println("Started JavaMOP HasNextMonitorAspect");
+		System.out.println("[JavaMOP.HasNext] Started");
 	}
 
 	// Declarations for the Lock
@@ -330,9 +330,24 @@ public aspect HasNextMonitorAspect implements javamoprt.MOPObject {
 		}
 	}
 	
-	before() : call (* org.dacapo.harness.Callback+.stop()) {
+	before() : execution (* org.dacapo.harness.Callback+.stop()) {
 		System.out.println("[JavaMOP.HasNext] Stopping and resetting... Reported " + HasNextMonitor.MATCHES.get() + " violations.");
 		HasNextMonitor.MATCHES.set(0); // reset counter
+		
+		HasNext_activated = false;
+
+		HasNext_i_Map = new javamoprt.map.MOPBasicRefMapOfMonitor(0);
+		HasNext_i_Map_cachekey_0 = javamoprt.map.MOPBasicRefMapOfMonitor.NULRef;
+		HasNext_i_Map_cachenode = null;
+
+		HasNext_Iterator_RefMap = HasNext_i_Map;
+		
+		HasNextMapManager = new javamoprt.map.MOPMapManager();
+		HasNextMapManager.start();
+		
+		System.gc();
+		System.gc();
+		
 	}
 
 }
