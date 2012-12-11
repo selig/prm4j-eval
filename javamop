@@ -12,7 +12,7 @@
 DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
 
 echo "Resolving maven dependencies... (may take a while)"
-mvn -q dependency:resolve --update-snapshots
+mvn dependency:resolve --update-snapshots
 
 # get and process classpath from maven pom
 mvn -q dependency:build-classpath -Dmdep.outputFile=dependency-outputfile
@@ -41,8 +41,8 @@ java -jar $AJC -cp ${RT}:${JAVAMOPRT}:$DACAPO:$GUAVA src/main/java/mop/* -d targ
 javac src/main/java/prm4jeval/* -d target/classes -cp $DACAPO:$APACHEMATH:$GUAVA
 jar cf target/jars/Callback.jar -C target/classes .
 
-# load-time weaving via aspectjweaver, run for 16 iterations
-for i in {0..15}; do
+# load-time weaving via aspectjweaver, run 16 invocations with up to 25 iterations
+for invocation in {0..15}; do
 	for paramProperty in HasNext UnsafeIterator UnsafeMapIterator SafeSyncCollection SafeSyncMap ; do
 		
 		# create custom aop-ajc.xml and put in META-INF
@@ -58,9 +58,10 @@ for i in {0..15}; do
 			pmd sunflow tomcat tradebeans tradesoap xalan ; do
 		STATUS=0
 			while [ $STATUS -eq 0 ]; do
-    			echo "Starting benchmark [javamop:$benchmark:$paramProperty] measurement $i..."
+    			echo "Starting benchmark [javamop:$benchmark:$paramProperty] invocation $invocation..."
 				java -Xms256M -Xmx2048M -javaagent:${WEAVER} -Xbootclasspath/a:$RT \
-					-Dprm4jeval.outputfile=results/javamop.ser \
+					-Dprm4jeval.invocation=$invocation \
+					-Dprm4jeval.outputfile=results/javamop.log \
 					-Dprm4jeval.benchmark=$benchmark -Dprm4jeval.parametricProperty=$paramProperty \
 					-cp $DACAPO:$GUAVA:$JAVAMOPRT:$APACHEMATH:${DIR}/target/jars/mop/$paramProperty.jar:${DIR}/target/jars/Callback.jar \
 					Harness --no-validation -c prm4jeval.EvalCallback $benchmark
