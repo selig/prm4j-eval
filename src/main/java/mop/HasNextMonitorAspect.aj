@@ -2,7 +2,6 @@ package mop;
 import java.io.*;
 import java.util.*;
 import java.util.concurrent.atomic.AtomicInteger;
-import org.dacapo.harness.Callback;
 
 import javamoprt.*;
 import java.lang.ref.*;
@@ -331,7 +330,7 @@ public aspect HasNextMonitorAspect implements javamoprt.MOPObject {
 		}
 	}
 	
-	before() : call (* Callback+.stop()) {
+	before() : call (* org.dacapo.harness.Callback+.stop()) {
 		System.out.println("[JavaMOP.HasNext] Stopping and resetting... Reported " + HasNextMonitor.MATCHES.get() + " violations.");
 		HasNextMonitor.MATCHES.set(0); // reset counter
 	}
