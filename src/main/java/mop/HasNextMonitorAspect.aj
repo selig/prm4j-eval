@@ -1,9 +1,11 @@
 package mop;
 import java.io.*;
 import java.util.*;
+import java.util.concurrent.atomic.AtomicInteger;
+import org.dacapo.harness.Callback;
+
 import javamoprt.*;
 import java.lang.ref.*;
-import org.aspectj.lang.*;
 
 class HasNextMonitor_Set extends javamoprt.MOPSet {
 	protected HasNextMonitor[] elementData;
@@ -138,6 +140,9 @@ class HasNextMonitor_Set extends javamoprt.MOPSet {
 }
 
 class HasNextMonitor extends javamoprt.MOPMonitor implements Cloneable, javamoprt.MOPObject {
+    
+    	public static AtomicInteger MATCHES = new AtomicInteger();
+    	
 	public Object clone() {
 		try {
 			HasNextMonitor ret = (HasNextMonitor) super.clone();
@@ -175,7 +180,7 @@ class HasNextMonitor extends javamoprt.MOPMonitor implements Cloneable, javamopr
 
 	public final void Prop_1_handler_match (Iterator i){
 		{
-			System.out.println("next called without hasNext!");
+		    MATCHES.incrementAndGet();
 		}
 
 	}
@@ -324,6 +329,11 @@ public aspect HasNextMonitorAspect implements javamoprt.MOPObject {
 				mainMonitor.Prop_1_handler_match(i);
 			}
 		}
+	}
+	
+	before() : call (* Callback+.stop()) {
+		System.out.println("[JavaMOP.HasNext] Stopping and resetting... Reported " + HasNextMonitor.MATCHES.get() + " violations.");
+		HasNextMonitor.MATCHES.set(0); // reset counter
 	}
 
 }
