@@ -31,7 +31,9 @@ DACAPO=$(grep "dacapo" dependency-list)
 rm dependency-outputfile dependency-list
 
 # create working and target directories
+rm -rf target
 mkdir -p target/classes/META-INF target/jars/mop target/jars/prm4j
+mkdir -p results
 
 # compile the aspect into classes
 echo "Compiling aspect..."
