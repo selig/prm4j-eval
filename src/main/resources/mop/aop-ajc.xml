@@ -4,10 +4,11 @@
 		<aspect name="<aspectname>" />
 	</aspects>
 	<weaver>
+		<include>org.dacapo.harness.Callback</include>
 		<exclude within="mop..*" />
 		<exclude within="prm4jeval..*" />
 		<exclude within="org.apache.commons..*" />
-		<exclude within="org.dacapo..*" />
+		<exclude within="com.google..*" />
 		<exclude within="org.netbeans.lib.profiler..*" />
 	</weaver>
 </aspectj>
