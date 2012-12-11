@@ -1,11 +1,8 @@
 package mop;
-import java.io.*;
 import java.util.*;
-import java.util.concurrent.*;
+import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.locks.*;
 import javamoprt.*;
-import java.lang.ref.*;
-import org.aspectj.lang.*;
 
 class UnsafeMapIteratorMonitor_Set extends javamoprt.MOPSet {
 	protected UnsafeMapIteratorMonitor[] elementData;
@@ -180,6 +177,10 @@ class UnsafeMapIteratorMonitor_Set extends javamoprt.MOPSet {
 }
 
 class UnsafeMapIteratorMonitor extends javamoprt.MOPMonitor implements Cloneable, javamoprt.MOPObject {
+    
+    	// Counter added post-generation to measure number of matches
+	static AtomicInteger MATCHES = new AtomicInteger();
+    
 	public long tau = -1;
 	public Object clone() {
 		try {
@@ -243,7 +244,7 @@ class UnsafeMapIteratorMonitor extends javamoprt.MOPMonitor implements Cloneable
 
 	public final void Prop_1_handler_match (Map map, Collection c, Iterator i){
 		{
-			System.out.println("unsafe iterator usage!");
+			MATCHES.incrementAndGet();
 		}
 
 	}
@@ -774,6 +775,11 @@ public aspect UnsafeMapIteratorMonitorAspect implements javamoprt.MOPObject {
 			mainSet.event_updateMap(map);
 		}
 		UnsafeMapIterator_MOPLock.unlock();
+	}
+	
+	before() : call (* org.dacapo.harness.Callback+.stop()) {
+		System.out.println("[JavaMOP.UnsafeMapIterator] Stopping and resetting... Reported " + UnsafeMapIteratorMonitor.MATCHES.get() + " violations.");
+		UnsafeMapIteratorMonitor.MATCHES.set(0); // reset counter
 	}
 
 }

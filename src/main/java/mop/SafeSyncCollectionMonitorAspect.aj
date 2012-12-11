@@ -1,9 +1,11 @@
 package mop;
-import java.io.*;
-import java.util.*;
-import javamoprt.*;
-import java.lang.ref.*;
-import org.aspectj.lang.*;
+import java.util.Arrays;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.Iterator;
+import java.util.concurrent.atomic.AtomicInteger;
+
+import javamoprt.MOPMonitor;
 
 class SafeSyncCollectionMonitor_Set extends javamoprt.MOPSet {
 	protected SafeSyncCollectionMonitor[] elementData;
@@ -182,6 +184,10 @@ class SafeSyncCollectionMonitor_Set extends javamoprt.MOPSet {
 }
 
 class SafeSyncCollectionMonitor extends javamoprt.MOPMonitor implements Cloneable, javamoprt.MOPObject {
+    
+    	// Counter added post-generation to measure number of matches
+	static AtomicInteger MATCHES = new AtomicInteger();
+	
 	public long tau = -1;
 	public Object clone() {
 		try {
@@ -632,6 +638,11 @@ public aspect SafeSyncCollectionMonitorAspect implements javamoprt.MOPObject {
 				}
 			}
 		}
+	}
+	
+	before() : call (* org.dacapo.harness.Callback+.stop()) {
+		System.out.println("[JavaMOP.UnsafeIterator] Stopping and resetting... Reported " + SafeSyncCollectionMonitor.MATCHES.get() + " violations.");
+		SafeSyncCollectionMonitor.MATCHES.set(0); // reset counter
 	}
 
 }

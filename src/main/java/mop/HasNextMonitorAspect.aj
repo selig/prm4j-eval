@@ -1,10 +1,9 @@
 package mop;
-import java.io.*;
-import java.util.*;
+import java.util.Arrays;
+import java.util.Iterator;
 import java.util.concurrent.atomic.AtomicInteger;
 
-import javamoprt.*;
-import java.lang.ref.*;
+import javamoprt.MOPMonitor;
 
 class HasNextMonitor_Set extends javamoprt.MOPSet {
 	protected HasNextMonitor[] elementData;
@@ -140,7 +139,8 @@ class HasNextMonitor_Set extends javamoprt.MOPSet {
 
 class HasNextMonitor extends javamoprt.MOPMonitor implements Cloneable, javamoprt.MOPObject {
     
-    	public static AtomicInteger MATCHES = new AtomicInteger();
+    	// Counter added post-generation to measure number of matches
+    	static AtomicInteger MATCHES = new AtomicInteger();
     	
 	public Object clone() {
 		try {

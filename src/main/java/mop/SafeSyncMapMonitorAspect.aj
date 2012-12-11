@@ -1,9 +1,8 @@
 package mop;
-import java.io.*;
 import java.util.*;
+import java.util.concurrent.atomic.AtomicInteger;
+
 import javamoprt.*;
-import java.lang.ref.*;
-import org.aspectj.lang.*;
 
 class SafeSyncMapMonitor_Set extends javamoprt.MOPSet {
 	protected SafeSyncMapMonitor[] elementData;
@@ -210,6 +209,10 @@ class SafeSyncMapMonitor_Set extends javamoprt.MOPSet {
 }
 
 class SafeSyncMapMonitor extends javamoprt.MOPMonitor implements Cloneable, javamoprt.MOPObject {
+    
+    	// Counter added post-generation to measure number of matches
+	static AtomicInteger MATCHES = new AtomicInteger();
+	
 	public long tau = -1;
 	public Object clone() {
 		try {
@@ -292,7 +295,7 @@ class SafeSyncMapMonitor extends javamoprt.MOPMonitor implements Cloneable, java
 
 	public final void Prop_1_handler_match (Map syncMap, Set mapSet, Iterator iter){
 		{
-			System.out.println("synchronized collection accessed in non threadsafe manner!");
+			MATCHES.incrementAndGet();
 		}
 
 	}
@@ -376,6 +379,7 @@ public aspect SafeSyncMapMonitorAspect implements javamoprt.MOPObject {
 	public SafeSyncMapMonitorAspect(){
 		SafeSyncMapMapManager = new javamoprt.map.MOPMapManager();
 		SafeSyncMapMapManager.start();
+		System.out.println("Started JavaMOP SafeSyncMapMonitorAspect");
 	}
 
 	// Declarations for the Lock
@@ -929,6 +933,11 @@ public aspect SafeSyncMapMonitorAspect implements javamoprt.MOPObject {
 				}
 			}
 		}
+	}
+	
+	before() : call (* org.dacapo.harness.Callback+.stop()) {
+		System.out.println("[JavaMOP.HasNext] Stopping and resetting... Reported " + SafeSyncMapMonitor.MATCHES.get() + " violations.");
+		SafeSyncMapMonitor.MATCHES.set(0); // reset counter
 	}
 
 }
