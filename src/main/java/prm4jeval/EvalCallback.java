@@ -1,6 +1,11 @@
 package prm4jeval;
 
-import java.util.Arrays;
+import java.util.logging.FileHandler;
+import java.util.logging.Formatter;
+import java.util.logging.Handler;
+import java.util.logging.Level;
+import java.util.logging.LogRecord;
+import java.util.logging.Logger;
 
 import org.dacapo.harness.Callback;
 import org.dacapo.harness.CommandLineArgs;
@@ -8,8 +13,12 @@ import org.dacapo.parser.Config;
 
 public class EvalCallback extends Callback {
 
-    private final EvaluationData evaluationData;
-    private final SteadyStateEvaluation sse;
+    private SteadyStateInvocation ssi;
+    private final Logger logger;
+
+    private final String benchmark;
+    private final String parametricProperty;
+    private final int invocation;
 
     private int iterationCount = 0;
 
@@ -17,10 +26,28 @@ public class EvalCallback extends Callback {
 
     public EvalCallback(CommandLineArgs args) {
 	super(args);
-	evaluationData = new EvaluationData(System.getProperty("prm4jeval.outputfile"));
-	sse = evaluationData.getSteadyStateEvalation(System.getProperty("prm4jeval.benchmark"),
-		System.getProperty("prm4jeval.parametricProperty"));
-	System.out.println("EvalCallback loaded." + Arrays.toString(args.getArgs()));
+	logger = getFileLogger(System.getProperty("prm4jeval.outputfile"));
+	benchmark = System.getProperty("prm4jeval.benchmark");
+	parametricProperty = System.getProperty("prm4jeval.parametricProperty");
+	invocation = Integer.parseInt(System.getProperty("prm4jeval.invocation"));
+    }
+
+    private static Logger getFileLogger(String fileName) {
+	final Logger logger = Logger.getLogger(fileName);
+	try {
+	    logger.setUseParentHandlers(false);
+	    Handler handler = new FileHandler(fileName, true);
+	    handler.setFormatter(new Formatter() {
+		@Override
+		public String format(LogRecord record) {
+		    return record.getMessage() + "\n";
+		}
+	    });
+	    logger.addHandler(handler);
+	} catch (Exception e) {
+	    throw new RuntimeException(e);
+	}
+	return logger;
     }
 
     @Override
@@ -32,6 +59,7 @@ public class EvalCallback extends Callback {
     @Override
     public void init(Config arg0) {
 	System.out.println("[DaCapo] Initializing...");
+	ssi = new SteadyStateInvocation();
 	super.init(arg0);
     }
 
@@ -45,22 +73,18 @@ public class EvalCallback extends Callback {
     @Override
     public void stop() {
 	long elapsedTime = System.currentTimeMillis() - startTime;
-	sse.getCurrentInvocation().addMeasurement(elapsedTime);
+	ssi.addMeasurement(elapsedTime);
+	logger.log(Level.INFO, String.format("%02d %s %s iter %02d %d %f", invocation, benchmark, parametricProperty,
+		iterationCount, elapsedTime, ssi.getCoefficientOfStandardDeviation()));
 	System.out.println("[DaCapo] Stopping... time: " + elapsedTime);
 	super.stop();
     }
 
     @Override
     public boolean runAgain() {
-	evaluationData.storeEvaluationData();
-	if (sse.getCurrentInvocation().isThresholdReached()) {
-	    double mean = sse.getConfidenceInterval().getMean();
-	    double width = sse.getConfidenceInterval().getWidth();
-	    sse.closeCurrentInvocation();
-	    evaluationData.storeEvaluationData();
-	    System.out.println("[prm4jeval] Threshold reached after " + iterationCount
-		    + " iterations. Current mean is " + mean + " with confidence interval width " + width
-		    + ", exiting!");
+	if (ssi.isThresholdReached()) {
+	    logger.log(Level.INFO, String.format("%02d %s %s mean %02d %f %f", invocation, benchmark,
+		    parametricProperty, iterationCount, ssi.getMean(), ssi.getCoefficientOfStandardDeviation()));
 	    System.exit(1);
 	}
 	return true;

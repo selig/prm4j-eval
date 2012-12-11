@@ -53,20 +53,23 @@ public class SteadyStateInvocation implements Serializable {
 	if (measurements.getN() < window) {
 	    return false;
 	}
-	double standardDeviation = measurements.getStandardDeviation();
-	double mean = measurements.getMean();
-	double coefficientOfStandardDeviation = standardDeviation / mean;
-	System.out.println("Coefficient of standard deviation is: " + coefficientOfStandardDeviation);
-	if (coefficientOfStandardDeviation < covThreshold) {
-	    System.out.println("Reached cov-threshold!");
+	double cov = getCoefficientOfStandardDeviation();
+	if (cov < covThreshold) {
+	    System.out.println("Reached cov-threshold: " + cov);
 	    return true;
 	}
 	if (iteration++ >= 25) {
-	    System.out.println("Performed 25 iterations, proceeding with cov=" + coefficientOfStandardDeviation
-		    + " and mean of last " + window + " measurements: " + measurements.getMean());
+	    System.out.println("Performed 25 iterations, proceeding with cov=" + cov + " and mean of last " + window
+		    + " measurements: " + measurements.getMean());
 	    return true;
 	}
 	return false;
+    }
+
+    public double getCoefficientOfStandardDeviation() {
+	double standardDeviation = measurements.getStandardDeviation();
+	double mean = measurements.getMean();
+	return standardDeviation / mean;
     }
 
     /**

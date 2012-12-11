@@ -57,6 +57,10 @@ public class EvaluationData {
 	return data.columnKeySet();
     }
 
+    public ArrayTable<String, String, SteadyStateEvaluation> getData() {
+	return data;
+    }
+
     public SteadyStateEvaluation getSteadyStateEvalation(String benchmark, String parametricProperty) {
 	if (!getBenchmarks().contains(benchmark))
 	    throw new IllegalArgumentException("Benchmark not known: " + benchmark);
