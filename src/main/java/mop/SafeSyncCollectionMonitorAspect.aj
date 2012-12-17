@@ -185,8 +185,10 @@ class SafeSyncCollectionMonitor_Set extends javamoprt.MOPSet {
 
 class SafeSyncCollectionMonitor extends javamoprt.MOPMonitor implements Cloneable, javamoprt.MOPObject {
     
-    	// Counter added post-generation to measure number of matches
-	static AtomicInteger MATCHES = new AtomicInteger();
+    	/**
+    	 *  prm4j-eval: Measures number of matches.
+    	 */
+	static AtomicInteger MATCHES = new AtomicInteger();  // prm4j-eval
 	
 	public long tau = -1;
 	public Object clone() {
@@ -252,7 +254,7 @@ class SafeSyncCollectionMonitor extends javamoprt.MOPMonitor implements Cloneabl
 
 	public final void Prop_1_handler_match (Object c, Iterator iter){
 		{
-			System.out.println("pattern matched!");
+		    MATCHES.incrementAndGet(); // prm4j-eval
 		}
 
 	}
@@ -315,11 +317,13 @@ class SafeSyncCollectionMonitor extends javamoprt.MOPMonitor implements Cloneabl
 }
 
 public aspect SafeSyncCollectionMonitorAspect implements javamoprt.MOPObject {
-	javamoprt.map.MOPMapManager SafeSyncCollectionMapManager;
+	javamoprt.map.MOPMapManager SafeSyncCollectionMapManager;  // prm4j-eval
+	private final MemoryLogger memoryLogger;
 	public SafeSyncCollectionMonitorAspect(){
 		SafeSyncCollectionMapManager = new javamoprt.map.MOPMapManager();
 		SafeSyncCollectionMapManager.start();
-		System.out.println("[JavaMOP.SafeSyncCollection] Started"); 
+		System.out.println("[JavaMOP.SafeSyncCollection] Started"); // prm4j-eval
+		memoryLogger = new MemoryLogger("logs/javaMOP-SafeSyncCollection.log");  // prm4j-eval
 	}
 
 	// Declarations for the Lock
@@ -352,6 +356,7 @@ public aspect SafeSyncCollectionMonitorAspect implements javamoprt.MOPObject {
 	after () returning (Object c) : SafeSyncCollection_sync() {
 		SafeSyncCollection_activated = true;
 		synchronized(SafeSyncCollection_MOPLock) {
+		    	memoryLogger.logMemoryConsumption(); // prm4j-eval
 			SafeSyncCollectionMonitor mainMonitor = null;
 			javamoprt.map.MOPMap mainMap = null;
 			SafeSyncCollectionMonitor_Set mainSet = null;
@@ -405,6 +410,7 @@ public aspect SafeSyncCollectionMonitorAspect implements javamoprt.MOPObject {
 	after (Object c) returning (Iterator iter) : SafeSyncCollection_syncCreateIter(c) {
 		synchronized(SafeSyncCollection_MOPLock) {
 			if (SafeSyncCollection_activated) {
+			    	memoryLogger.logMemoryConsumption(); // prm4j-eval
 				Object obj;
 				javamoprt.map.MOPMap tempMap;
 				SafeSyncCollectionMonitor mainMonitor = null;
@@ -504,6 +510,7 @@ public aspect SafeSyncCollectionMonitorAspect implements javamoprt.MOPObject {
 	after (Object c) returning (Iterator iter) : SafeSyncCollection_asyncCreateIter(c) {
 		synchronized(SafeSyncCollection_MOPLock) {
 			if (SafeSyncCollection_activated) {
+			    	memoryLogger.logMemoryConsumption(); // prm4j-eval
 				Object obj;
 				javamoprt.map.MOPMap tempMap;
 				SafeSyncCollectionMonitor mainMonitor = null;
@@ -603,6 +610,7 @@ public aspect SafeSyncCollectionMonitorAspect implements javamoprt.MOPObject {
 	before (Iterator iter) : SafeSyncCollection_accessIter(iter) {
 		synchronized(SafeSyncCollection_MOPLock) {
 			if (SafeSyncCollection_activated) {
+			    	memoryLogger.logMemoryConsumption(); // prm4j-eval
 				SafeSyncCollectionMonitor mainMonitor = null;
 				javamoprt.map.MOPMap mainMap = null;
 				SafeSyncCollectionMonitor_Set mainSet = null;
@@ -641,6 +649,9 @@ public aspect SafeSyncCollectionMonitorAspect implements javamoprt.MOPObject {
 		}
 	}
 	
+	/**
+	 *  prm4j-eval: resets the parametric monitor
+	 */
 	before() : execution (* org.dacapo.harness.Callback+.stop()) {
 		System.out.println("[JavaMOP.SafeSyncCollection] Stopping and resetting... Reported " + SafeSyncCollectionMonitor.MATCHES.get() + " violations.");
 		SafeSyncCollectionMonitor.MATCHES.set(0); // reset counter

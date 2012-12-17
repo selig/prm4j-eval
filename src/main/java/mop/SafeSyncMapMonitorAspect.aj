@@ -210,8 +210,10 @@ class SafeSyncMapMonitor_Set extends javamoprt.MOPSet {
 
 class SafeSyncMapMonitor extends javamoprt.MOPMonitor implements Cloneable, javamoprt.MOPObject {
     
-    	// Counter added post-generation to measure number of matches
-	static AtomicInteger MATCHES = new AtomicInteger();
+    	/**
+	 *  prm4j-eval: Measures number of matches.
+	 */
+	static AtomicInteger MATCHES = new AtomicInteger(); // prm4j-eval
 	
 	public long tau = -1;
 	public Object clone() {
@@ -295,7 +297,7 @@ class SafeSyncMapMonitor extends javamoprt.MOPMonitor implements Cloneable, java
 
 	public final void Prop_1_handler_match (Map syncMap, Set mapSet, Iterator iter){
 		{
-			MATCHES.incrementAndGet();
+			MATCHES.incrementAndGet(); // prm4j-eval
 		}
 
 	}
@@ -376,10 +378,12 @@ class SafeSyncMapMonitor extends javamoprt.MOPMonitor implements Cloneable, java
 
 public aspect SafeSyncMapMonitorAspect implements javamoprt.MOPObject {
 	javamoprt.map.MOPMapManager SafeSyncMapMapManager;
+	private final MemoryLogger memoryLogger; // prm4j-eval
 	public SafeSyncMapMonitorAspect(){
 		SafeSyncMapMapManager = new javamoprt.map.MOPMapManager();
 		SafeSyncMapMapManager.start();
 		System.out.println("[JavaMOP.SafeSyncMap] Started");
+		memoryLogger = new MemoryLogger("logs/javaMOP-SafeSyncMap.log"); // prm4j-eval
 	}
 
 	// Declarations for the Lock
@@ -424,6 +428,7 @@ public aspect SafeSyncMapMonitorAspect implements javamoprt.MOPObject {
 	after () returning (Map syncMap) : SafeSyncMap_sync() {
 		SafeSyncMap_activated = true;
 		synchronized(SafeSyncMap_MOPLock) {
+		    	memoryLogger.logMemoryConsumption(); // prm4j-eval
 			SafeSyncMapMonitor mainMonitor = null;
 			javamoprt.map.MOPMap mainMap = null;
 			SafeSyncMapMonitor_Set mainSet = null;
@@ -477,6 +482,7 @@ public aspect SafeSyncMapMonitorAspect implements javamoprt.MOPObject {
 	after (Map syncMap) returning (Set mapSet) : SafeSyncMap_createSet(syncMap) {
 		synchronized(SafeSyncMap_MOPLock) {
 			if (SafeSyncMap_activated) {
+			    	memoryLogger.logMemoryConsumption(); // prm4j-eval
 				Object obj;
 				javamoprt.map.MOPMap tempMap;
 				SafeSyncMapMonitor mainMonitor = null;
@@ -584,6 +590,7 @@ public aspect SafeSyncMapMonitorAspect implements javamoprt.MOPObject {
 		synchronized(SafeSyncMap_MOPLock) {
 			//SafeSyncMap_syncCreateIter
 			if (SafeSyncMap_activated) {
+			    	memoryLogger.logMemoryConsumption(); // prm4j-eval
 				Object obj;
 				javamoprt.map.MOPMap tempMap;
 				SafeSyncMapMonitor mainMonitor = null;
@@ -738,6 +745,7 @@ public aspect SafeSyncMapMonitorAspect implements javamoprt.MOPObject {
 			}
 			//SafeSyncMap_asyncCreateIter
 			if (SafeSyncMap_activated) {
+			    	memoryLogger.logMemoryConsumption(); // prm4j-eval
 				Object obj;
 				javamoprt.map.MOPMap tempMap;
 				SafeSyncMapMonitor mainMonitor = null;
@@ -897,6 +905,7 @@ public aspect SafeSyncMapMonitorAspect implements javamoprt.MOPObject {
 	before (Iterator iter) : SafeSyncMap_accessIter(iter) {
 		synchronized(SafeSyncMap_MOPLock) {
 			if (SafeSyncMap_activated) {
+			    	memoryLogger.logMemoryConsumption(); // prm4j-eval
 				SafeSyncMapMonitor mainMonitor = null;
 				javamoprt.map.MOPMap mainMap = null;
 				SafeSyncMapMonitor_Set mainSet = null;
@@ -935,6 +944,9 @@ public aspect SafeSyncMapMonitorAspect implements javamoprt.MOPObject {
 		}
 	}
 	
+	/**
+	 *  prm4j-eval: resets the parametric monitor
+	 */
 	before() : execution (* org.dacapo.harness.Callback+.stop()) {
 		System.out.println("[JavaMOP.SafeSyncMap] Stopping and resetting... Reported " + SafeSyncMapMonitor.MATCHES.get() + " violations.");
 		SafeSyncMapMonitor.MATCHES.set(0); // reset counter

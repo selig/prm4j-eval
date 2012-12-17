@@ -158,8 +158,10 @@ class UnsafeIteratorMonitor_Set extends javamoprt.MOPSet {
 
 class UnsafeIteratorMonitor extends javamoprt.MOPMonitor implements Cloneable, javamoprt.MOPObject {
     
-    	// Counter added post-generation to measure number of matches
-	static AtomicInteger MATCHES = new AtomicInteger();
+    	/**
+    	 *  prm4j-eval: Measures number of matches.
+    	 */
+	static AtomicInteger MATCHES = new AtomicInteger(); // prm4j-eval
     
 	public long tau = -1;
 	public Object clone() {
@@ -207,7 +209,7 @@ class UnsafeIteratorMonitor extends javamoprt.MOPMonitor implements Cloneable, j
 
 	public final void Prop_1_handler_match (Collection c, Iterator i){
 		{
-		    MATCHES.incrementAndGet();
+		    MATCHES.incrementAndGet(); // prm4j-eval
 		}
 
 	}
@@ -274,10 +276,12 @@ class UnsafeIteratorMonitor extends javamoprt.MOPMonitor implements Cloneable, j
 
 public aspect UnsafeIteratorMonitorAspect implements javamoprt.MOPObject {
 	javamoprt.map.MOPMapManager UnsafeIteratorMapManager;
+	private final MemoryLogger memoryLogger; // prm4j-eval
 	public UnsafeIteratorMonitorAspect(){
 		UnsafeIteratorMapManager = new javamoprt.map.MOPMapManager();
 		UnsafeIteratorMapManager.start();
-		System.out.println("[JavaMOP.UnsafeIterator] Started");
+		memoryLogger = new MemoryLogger("logs/javaMOP-UnsafeIteratorMonitor.log"); // prm4j-eval
+		System.out.println("[JavaMOP.UnsafeIterator] Started"); // prm4j-eval
 	}
 
 	// Declarations for the Lock
@@ -313,6 +317,7 @@ public aspect UnsafeIteratorMonitorAspect implements javamoprt.MOPObject {
 		while (!UnsafeIterator_MOPLock.tryLock()) {
 			Thread.yield();
 		}
+		memoryLogger.logMemoryConsumption(); // prm4j-eval
 		Object obj;
 		javamoprt.map.MOPMap tempMap;
 		UnsafeIteratorMonitor mainMonitor = null;
@@ -395,6 +400,7 @@ public aspect UnsafeIteratorMonitorAspect implements javamoprt.MOPObject {
 		while (!UnsafeIterator_MOPLock.tryLock()) {
 			Thread.yield();
 		}
+		memoryLogger.logMemoryConsumption();  // prm4j-eval
 		UnsafeIteratorMonitor mainMonitor = null;
 		javamoprt.map.MOPMap mainMap = null;
 		UnsafeIteratorMonitor_Set mainSet = null;
@@ -450,6 +456,7 @@ public aspect UnsafeIteratorMonitorAspect implements javamoprt.MOPObject {
 		while (!UnsafeIterator_MOPLock.tryLock()) {
 			Thread.yield();
 		}
+		memoryLogger.logMemoryConsumption(); // prm4j-eval
 		UnsafeIteratorMonitor mainMonitor = null;
 		javamoprt.map.MOPMap mainMap = null;
 		UnsafeIteratorMonitor_Set mainSet = null;
@@ -499,6 +506,9 @@ public aspect UnsafeIteratorMonitorAspect implements javamoprt.MOPObject {
 		UnsafeIterator_MOPLock.unlock();
 	}
 	
+	/**
+	 *  prm4j-eval: resets the parametric monitor
+	 */
 	before() : execution (* org.dacapo.harness.Callback+.stop()) {
 		System.out.println("[JavaMOP.UnsafeIterator] Stopping and resetting... Reported " + UnsafeIteratorMonitor.MATCHES.get() + " violations.");
 		UnsafeIteratorMonitor.MATCHES.set(0); // reset counter

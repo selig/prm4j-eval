@@ -2,6 +2,12 @@ package mop;
 import java.util.Arrays;
 import java.util.Iterator;
 import java.util.concurrent.atomic.AtomicInteger;
+import java.util.logging.FileHandler;
+import java.util.logging.Formatter;
+import java.util.logging.Handler;
+import java.util.logging.Level;
+import java.util.logging.LogRecord;
+import java.util.logging.Logger;
 
 import javamoprt.MOPMonitor;
 
@@ -139,8 +145,10 @@ class HasNextMonitor_Set extends javamoprt.MOPSet {
 
 class HasNextMonitor extends javamoprt.MOPMonitor implements Cloneable, javamoprt.MOPObject {
     
-    	// Counter added post-generation to measure number of matches
-    	static AtomicInteger MATCHES = new AtomicInteger();
+    	/**
+	 *  prm4j-eval: Measures number of matches.
+	 */
+    	static AtomicInteger MATCHES = new AtomicInteger(); // prm4j-eval
     	
 	public Object clone() {
 		try {
@@ -179,7 +187,7 @@ class HasNextMonitor extends javamoprt.MOPMonitor implements Cloneable, javamopr
 
 	public final void Prop_1_handler_match (Iterator i){
 		{
-		    MATCHES.incrementAndGet();
+		    MATCHES.incrementAndGet(); // prm4j-eval
 		}
 
 	}
@@ -230,10 +238,12 @@ class HasNextMonitor extends javamoprt.MOPMonitor implements Cloneable, javamopr
 
 public aspect HasNextMonitorAspect implements javamoprt.MOPObject {
 	javamoprt.map.MOPMapManager HasNextMapManager;
+	private final MemoryLogger memoryLogger; // prm4j-eval
 	public HasNextMonitorAspect(){
 		HasNextMapManager = new javamoprt.map.MOPMapManager();
 		HasNextMapManager.start();
-		System.out.println("[JavaMOP.HasNext] Started");
+		System.out.println("[JavaMOP.HasNext] Started"); // prm4j-eval
+		memoryLogger = new MemoryLogger("logs/javaMOP-HasNext.log"); // prm4j-eval
 	}
 
 	// Declarations for the Lock
@@ -254,6 +264,7 @@ public aspect HasNextMonitorAspect implements javamoprt.MOPObject {
 	after (Iterator i) : HasNext_hasnext(i) {
 		HasNext_activated = true;
 		synchronized(HasNext_MOPLock) {
+		    	memoryLogger.logMemoryConsumption(); // prm4j-eval
 			HasNextMonitor mainMonitor = null;
 			javamoprt.map.MOPMap mainMap = null;
 			javamoprt.ref.MOPWeakReference TempRef_i;
@@ -294,6 +305,7 @@ public aspect HasNextMonitorAspect implements javamoprt.MOPObject {
 	before (Iterator i) : HasNext_next(i) {
 		HasNext_activated = true;
 		synchronized(HasNext_MOPLock) {
+		    	memoryLogger.logMemoryConsumption(); // prm4j-eval
 			HasNextMonitor mainMonitor = null;
 			javamoprt.map.MOPMap mainMap = null;
 			javamoprt.ref.MOPWeakReference TempRef_i;
@@ -330,6 +342,9 @@ public aspect HasNextMonitorAspect implements javamoprt.MOPObject {
 		}
 	}
 	
+	/**
+	 *  prm4j-eval: resets the parametric monitor
+	 */
 	before() : execution (* org.dacapo.harness.Callback+.stop()) {
 		System.out.println("[JavaMOP.HasNext] Stopping and resetting... Reported " + HasNextMonitor.MATCHES.get() + " violations.");
 		HasNextMonitor.MATCHES.set(0); // reset counter
@@ -349,5 +364,5 @@ public aspect HasNextMonitorAspect implements javamoprt.MOPObject {
 		System.gc();
 		
 	}
-
+	
 }
