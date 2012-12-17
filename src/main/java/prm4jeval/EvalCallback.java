@@ -26,10 +26,10 @@ public class EvalCallback extends Callback {
 
     public EvalCallback(CommandLineArgs args) {
 	super(args);
-	logger = getFileLogger(System.getProperty("prm4jeval.outputfile"));
-	benchmark = System.getProperty("prm4jeval.benchmark");
-	parametricProperty = System.getProperty("prm4jeval.parametricProperty");
-	invocation = Integer.parseInt(System.getProperty("prm4jeval.invocation"));
+	logger = getFileLogger(getMandatorySystemProperty("prm4jeval.outputfile"));
+	benchmark = getMandatorySystemProperty("prm4jeval.benchmark");
+	parametricProperty = getMandatorySystemProperty("prm4jeval.parametricProperty");
+	invocation = Integer.parseInt(getMandatorySystemProperty("prm4jeval.invocation"));
     }
 
     /**
@@ -95,6 +95,14 @@ public class EvalCallback extends Callback {
 	    System.exit(1);
 	}
 	return true;
+    }
+
+    static String getMandatorySystemProperty(String key) {
+	final String value = System.getProperty(key);
+	if (value == null) {
+	    throw new RuntimeException("System property [" + key + "] is mandatory but not defined!");
+	}
+	return value;
     }
 
 }
