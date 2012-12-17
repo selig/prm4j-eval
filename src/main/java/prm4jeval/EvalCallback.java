@@ -32,6 +32,13 @@ public class EvalCallback extends Callback {
 	invocation = Integer.parseInt(System.getProperty("prm4jeval.invocation"));
     }
 
+    /**
+     * A simple file logger which outputs only the message.
+     *
+     * @param fileName
+     *            path to the output file
+     * @return the logger
+     */
     private static Logger getFileLogger(String fileName) {
 	final Logger logger = Logger.getLogger(fileName);
 	try {
