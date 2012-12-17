@@ -25,18 +25,22 @@ APACHEMATH=$(grep "math3" dependency-list)
 # cleanup tempfiles
 rm dependency-outputfile dependency-list
 
+# create dir for results
+mkdir -p results
+
 # create jar with callback
 javac src/main/java/prm4jeval/* -d target/classes -cp $DACAPO:$APACHEMATH:$GUAVA
 jar cf target/jars/Callback.jar -C target/classes .
 
-for i in {1..15}; do
+for i in {0..15}; do
 	for benchmark in avrora batik eclipse fop h2 jython luindex lusearch pmd sunflow tomcat tradebeans tradesoap xalan ; do
 	STATUS=0
 		while [ $STATUS -eq 0 ]; do
     		echo "Starting benchmark [pure:$benchmark] measurement $i..."
 			java -Xms256M -Xmx2048M \
-				-Dprm4jeval.outputfile=results/puredacapo.ser \
-				-Dprm4jeval.benchmark=$benchmark -Dprm4jeval.parametricProperty=Pure \
+				-Dprm4jeval.outputfile=results/puredacapo.log \
+				-Dprm4jeval.invocation=$i \
+				-Dprm4jeval.benchmark=$benchmark -Dprm4jeval.parametricProperty=- \
 				-cp $DACAPO:$GUAVA:$APACHEMATH:${DIR}/target/jars/Callback.jar \
 				Harness -c prm4jeval.EvalCallback $benchmark
 			STATUS=$?
