@@ -56,4 +56,9 @@ public aspect UnsafeMapIterator {
     after(Map map) : UnsafeMapIterator_updateMap(map) {
 	pm.processEvent(fsm.updateMap.createEvent(map));
     }
+    
+    before() : execution (* org.dacapo.harness.Callback+.stop()) {
+  	System.out.println("[prm4j.UnsafeMapIterator] Stopping and resetting...");
+  	pm.reset();
+      }
 }

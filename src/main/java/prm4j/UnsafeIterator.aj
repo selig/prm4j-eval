@@ -51,11 +51,11 @@ public aspect UnsafeIterator {
 	pm.processEvent(fsm.next.createEvent(i));
     }
 
-    before() : call (* Callback+.start(String)) {
+    before() : execution (* Callback+.start(String)) {
 	System.out.println("[prm4j.UnsafeIterator] Starting...");
     }
 
-    before() : call (* Callback+.stop()) {
+    before() : execution (* Callback+.stop()) {
 	System.out.println("[prm4j.UnsafeIterator] Stopping and resetting...");
 	pm.reset();
     }
