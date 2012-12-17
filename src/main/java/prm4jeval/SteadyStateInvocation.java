@@ -44,6 +44,7 @@ public class SteadyStateInvocation implements Serializable {
      * @return <code>true</code> if more measurements are needed
      */
     public boolean addMeasurement(long time) {
+	iteration++;
 	final double value = new Long(time).doubleValue();
 	measurements.addValue(value);
 	return isThresholdReached();
@@ -58,7 +59,7 @@ public class SteadyStateInvocation implements Serializable {
 	    System.out.println("Reached cov-threshold: " + cov);
 	    return true;
 	}
-	if (iteration++ >= 25) {
+	if (iteration >= 25) {
 	    System.out.println("Performed 25 iterations, proceeding with cov=" + cov + " and mean of last " + window
 		    + " measurements: " + measurements.getMean());
 	    return true;
