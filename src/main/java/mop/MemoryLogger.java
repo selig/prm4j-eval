@@ -26,24 +26,29 @@ public class MemoryLogger {
 
     private final static boolean MEMORY_LOGGING = Boolean.parseBoolean(getSystemProperty("prm4jeval.memoryLogging",
 	    "false"));
+
+    private SummaryStatistics memStats;
     private long timestamp = 0L;
+
     private Logger logger;
 
     private String benchmark;
     private String parametricProperty;
     private int invocation;
 
-    private SummaryStatistics memStats;
+    // Trying to track down NaNs which appeared in mean and max.
+    private int NaNcount = 0;
+
 
     MemoryLogger() {
 	if (MEMORY_LOGGING) {
+	    memStats = new SummaryStatistics();
 	    String outputPath = getMandatorySystemProperty("prm4jeval.outputfile") + ".mem.log";
 	    System.out.println("Memory logging activated. Output path: " + outputPath);
 	    benchmark = getMandatorySystemProperty("prm4jeval.benchmark");
 	    parametricProperty = getMandatorySystemProperty("prm4jeval.parametricProperty");
 	    invocation = Integer.parseInt(getMandatorySystemProperty("prm4jeval.invocation"));
 	    logger = getFileLogger(outputPath);
-	    memStats = new SummaryStatistics();
 	} else {
 	    System.out.println("Memory logging not activated.");
 	}
@@ -53,16 +58,12 @@ public class MemoryLogger {
 	if (MEMORY_LOGGING && timestamp++ % 100 == 0) {
 	    double memoryConsumption = (((double) (Runtime.getRuntime().totalMemory() / 1024) / 1024) - ((double) (Runtime
 		    .getRuntime().freeMemory() / 1024) / 1024));
-	    memStats.addValue(memoryConsumption);
-	}
-    }
-
-    public void logMemoryConsumptionToFile() {
-	if (MEMORY_LOGGING && timestamp++ % 100 == 0) {
-	    logger.log(Level.INFO, timestamp
-		    + " : "
-		    + (((double) (Runtime.getRuntime().totalMemory() / 1024) / 1024) - ((double) (Runtime.getRuntime()
-			    .freeMemory() / 1024) / 1024)));
+	    // filter NaNs
+	    if (memoryConsumption != Double.NaN) {
+		memStats.addValue(memoryConsumption);
+	    } else {
+		NaNcount++;
+	    }
 	}
     }
 
@@ -70,9 +71,18 @@ public class MemoryLogger {
 	if (MEMORY_LOGGING) {
 	    logger.log(
 		    Level.INFO,
-		    String.format("%02d %s %s iter %f %f", invocation, benchmark, parametricProperty,
-			    memStats.getMean(), memStats.getMax()));
+		    String.format("%02d %s %s iter %f %f %d", invocation, benchmark, parametricProperty,
+			    memStats.getMean(), memStats.getMax(), timestamp));
+
+	    System.out.println("Counted " + timestamp  + " events.");
+
+	    // Trying to track down NaNs which appeared in mean and max.
+	    if (NaNcount > 0) {
+		System.out.println("Counted " + NaNcount + " NaN-measurements of memory consumption.");
+	    }
+	    // reset
 	    memStats.clear();
+	    timestamp = 0L;
 	}
     }
 
