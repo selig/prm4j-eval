@@ -17,17 +17,27 @@ import java.util.logging.Level;
 import java.util.logging.LogRecord;
 import java.util.logging.Logger;
 
+/**
+ * Logs memory consumption to file. Activated by system property "prm4jeval.memoryLogging"
+ */
 public class MemoryLogger {
 
+    private final static boolean MEMORY_LOGGING = Boolean.parseBoolean(getSystemProperty("prm4jeval.memoryLogging",
+	    "false"));
     private long timestamp = 0L;
     private Logger logger;
 
     MemoryLogger(String outputPath) {
-	logger = getFileLogger(outputPath);
+	if (MEMORY_LOGGING) {
+	    System.out.println("Memory logging activated. Output path: " + outputPath);
+	    logger = getFileLogger(outputPath);
+	} else {
+	    System.out.println("Memory logging not activated.");
+	}
     }
 
     public void logMemoryConsumption() {
-	if (timestamp++ % 100 == 0) {
+	if (MEMORY_LOGGING && timestamp++ % 100 == 0) {
 	    logger.log(Level.INFO, timestamp
 		    + " : "
 		    + (((double) (Runtime.getRuntime().totalMemory() / 1024) / 1024) - ((double) (Runtime.getRuntime()
@@ -58,6 +68,11 @@ public class MemoryLogger {
 	    throw new RuntimeException(e);
 	}
 	return logger;
+    }
+
+    static String getSystemProperty(String key, String defaultValue) {
+	final String value = System.getProperty(key);
+	return value != null ? value : defaultValue;
     }
 
 }
