@@ -34,11 +34,11 @@ for i in {0..15}; do
 		while [ $STATUS -eq 0 ]; do
     		echo "Starting benchmark [pure:$benchmark] measurement $i..."
 			java -Xms256M -Xmx2048M \
-				-Dprm4jeval.outputfile=results/puredacapo.log \
+				-Dprm4jeval.outputfile=results/baseline.log \
 				-Dprm4jeval.invocation=$i \
 				-Dprm4jeval.benchmark=$benchmark -Dprm4jeval.parametricProperty=- \
 				-cp $DACAPO:$GUAVA:$APACHEMATH:${DIR}/target/jars/Callback.jar \
-				Harness -c prm4jeval.EvalCallback $benchmark
+				Harness --no-validation -c prm4jeval.EvalCallback $benchmark
 			STATUS=$?
 		done
 	done
