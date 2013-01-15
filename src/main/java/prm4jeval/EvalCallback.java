@@ -84,6 +84,8 @@ public class EvalCallback extends Callback {
 	logger.log(Level.INFO, String.format("%02d %s %s iter %02d %d %f", invocation, benchmark, parametricProperty,
 		iterationCount, elapsedTime, ssi.getCoefficientOfStandardDeviation()));
 	System.out.println("[DaCapo] Stopping... time: " + elapsedTime);
+	System.gc();
+	System.gc();
 	super.stop();
     }
 
