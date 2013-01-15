@@ -511,6 +511,9 @@ public aspect UnsafeIteratorMonitorAspect implements javamoprt.MOPObject {
 	 */
 	after() : execution (* org.dacapo.harness.Callback+.stop()) {
 		System.out.println("[JavaMOP.UnsafeIterator] Resetting... Reported " + UnsafeIteratorMonitor.MATCHES.get() + " violations.");
+
+		memoryLogger.reallyLogMemoryConsumption(); // so we have at least two values
+		
 		UnsafeIteratorMonitor.MATCHES.set(0); // reset counter
 		
 		UnsafeIterator_timestamp = 1;

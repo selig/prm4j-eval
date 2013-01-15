@@ -949,6 +949,9 @@ public aspect SafeSyncMapMonitorAspect implements javamoprt.MOPObject {
 	 */
 	after() : execution (* org.dacapo.harness.Callback+.stop()) {
 		System.out.println("[JavaMOP.SafeSyncMap] Resetting... Reported " + SafeSyncMapMonitor.MATCHES.get() + " violations.");
+
+		memoryLogger.reallyLogMemoryConsumption(); // so we have at least two values
+		
 		SafeSyncMapMonitor.MATCHES.set(0); // reset counter
 		
 		SafeSyncMap_timestamp = 1;

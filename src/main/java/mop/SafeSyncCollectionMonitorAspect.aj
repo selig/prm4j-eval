@@ -654,6 +654,9 @@ public aspect SafeSyncCollectionMonitorAspect implements javamoprt.MOPObject {
 	 */
 	after() : execution (* org.dacapo.harness.Callback+.stop()) {
 		System.out.println("[JavaMOP.SafeSyncCollection] Resetting... Reported " + SafeSyncCollectionMonitor.MATCHES.get() + " violations.");
+		
+		memoryLogger.reallyLogMemoryConsumption(); // so we have at least two values
+		
 		SafeSyncCollectionMonitor.MATCHES.set(0); // reset counter
 		
 		SafeSyncCollection_timestamp = 1;

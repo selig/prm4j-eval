@@ -347,6 +347,9 @@ public aspect HasNextMonitorAspect implements javamoprt.MOPObject {
 	 */
 	after() : execution (* org.dacapo.harness.Callback+.stop()) {
 		System.out.println("[JavaMOP.HasNext] Resetting... Reported " + HasNextMonitor.MATCHES.get() + " violations.");
+		
+		memoryLogger.reallyLogMemoryConsumption(); // so we have at least two values
+		
 		HasNextMonitor.MATCHES.set(0); // reset counter
 		
 		HasNext_activated = false;

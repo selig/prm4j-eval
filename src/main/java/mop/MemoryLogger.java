@@ -20,7 +20,7 @@ import java.util.logging.Logger;
 import org.apache.commons.math3.stat.descriptive.SummaryStatistics;
 
 /**
- * Logs memory consumption to file. Activated by system property "prm4jeval.memoryLogging"
+ * Logs memory consumption to file. Activated by system property "prm4jeval.memoryLogging".
  */
 public class MemoryLogger {
 
@@ -39,7 +39,6 @@ public class MemoryLogger {
     // Trying to track down NaNs which appeared in mean and max.
     private int NaNcount = 0;
 
-
     MemoryLogger() {
 	if (MEMORY_LOGGING) {
 	    memStats = new SummaryStatistics();
@@ -54,6 +53,9 @@ public class MemoryLogger {
 	}
     }
 
+    /**
+     * Registers the memory consumption every 100 events. Flag MEMORY_LOGGING has to be activated.
+     */
     public void logMemoryConsumption() {
 	if (MEMORY_LOGGING && timestamp++ % 100 == 0) {
 	    double memoryConsumption = (((double) (Runtime.getRuntime().totalMemory() / 1024) / 1024) - ((double) (Runtime
@@ -67,6 +69,26 @@ public class MemoryLogger {
 	}
     }
 
+    /**
+     * Registers the memory consumption independent of any internal event counter or timestamp. Flag MEMORY_LOGGING has
+     * to be activated.
+     */
+    public void reallyLogMemoryConsumption() {
+	if (MEMORY_LOGGING) {
+	    double memoryConsumption = (((double) (Runtime.getRuntime().totalMemory() / 1024) / 1024) - ((double) (Runtime
+		    .getRuntime().freeMemory() / 1024) / 1024));
+	    // filter NaNs
+	    if (memoryConsumption != Double.NaN) {
+		memStats.addValue(memoryConsumption);
+	    } else {
+		NaNcount++;
+	    }
+	}
+    }
+
+    /**
+     * Writes memory consumption (mean and max) and number of counted events to disk.
+     */
     public void writeToFile() {
 	if (MEMORY_LOGGING) {
 	    logger.log(
@@ -74,7 +96,7 @@ public class MemoryLogger {
 		    String.format("%02d %s %s iter %f %f %d", invocation, benchmark, parametricProperty,
 			    memStats.getMean(), memStats.getMax(), timestamp));
 
-	    System.out.println("Counted " + timestamp  + " events.");
+	    System.out.println("Counted " + timestamp + " events.");
 
 	    // Trying to track down NaNs which appeared in mean and max.
 	    if (NaNcount > 0) {
