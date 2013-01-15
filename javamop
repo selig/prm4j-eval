@@ -37,7 +37,7 @@ mkdir -p results
 
 # compile the aspect into classes
 echo "Compiling aspect..."
-java -jar $AJC -cp ${RT}:${JAVAMOPRT}:$DACAPO:$GUAVA src/main/java/mop/* -d target/classes -6
+java -jar $AJC -cp ${RT}:${JAVAMOPRT}:$DACAPO:$GUAVA:$APACHEMATH src/main/java/mop/* -d target/classes -6
 
 # create jar with callback
 javac src/main/java/prm4jeval/* -d target/classes -cp $DACAPO:$APACHEMATH:$GUAVA
@@ -51,12 +51,13 @@ for invocation in {0..15}; do
 		sed 's/<aspectname>/mop.'$paramProperty'MonitorAspect/g' src/main/resources/mop/aop-ajc.xml > target/classes/META-INF/aop-ajc.xml
 
 		# repackage each aspect into a single jars with the custom aop-ajc.xml
-		jar cf target/jars/mop/${paramProperty}.jar -C target/classes META-INF/aop-ajc.xml -C target/classes mop/${paramProperty}Monitor.class -C target/classes mop/${paramProperty}Monitor_Set.class -C target/classes mop/${paramProperty}MonitorAspect.class
+		jar cf target/jars/mop/${paramProperty}.jar -C target/classes META-INF/aop-ajc.xml -C target/classes mop/${paramProperty}Monitor.class -C target/classes mop/${paramProperty}Monitor_Set.class -C target/classes mop/${paramProperty}MonitorAspect.class -C target/classes mop/MemoryLogger.class
 
 		# cleanup custom aop-ajc.xml
 		rm target/classes/META-INF/aop-ajc.xml
 		
-		for benchmark in avrora batik eclipse fop h2 jython luindex lusearch \
+		# lusearch is removed because it keeps on crashing randomly
+		for benchmark in avrora batik eclipse fop h2 jython luindex \
 			pmd sunflow tomcat tradebeans tradesoap xalan ; do
 		STATUS=0
 			while [ $STATUS -eq 0 ]; do
@@ -64,6 +65,7 @@ for invocation in {0..15}; do
 				java -Xms256M -Xmx2048M -javaagent:${WEAVER} -Xbootclasspath/a:$RT \
 					-Dprm4jeval.invocation=$invocation \
 					-Dprm4jeval.outputfile=results/javamop.log \
+					-Dprm4jeval.memoryLogging=true \
 					-Dprm4jeval.benchmark=$benchmark -Dprm4jeval.parametricProperty=$paramProperty \
 					-cp $DACAPO:$GUAVA:$JAVAMOPRT:$APACHEMATH:${DIR}/target/jars/mop/$paramProperty.jar:${DIR}/target/jars/Callback.jar \
 					Harness --no-validation -c prm4jeval.EvalCallback $benchmark
