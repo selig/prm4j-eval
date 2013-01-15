@@ -509,8 +509,8 @@ public aspect UnsafeIteratorMonitorAspect implements javamoprt.MOPObject {
 	/**
 	 *  prm4j-eval: resets the parametric monitor
 	 */
-	before() : execution (* org.dacapo.harness.Callback+.stop()) {
-		System.out.println("[JavaMOP.UnsafeIterator] Stopping and resetting... Reported " + UnsafeIteratorMonitor.MATCHES.get() + " violations.");
+	after() : execution (* org.dacapo.harness.Callback+.stop()) {
+		System.out.println("[JavaMOP.UnsafeIterator] Resetting... Reported " + UnsafeIteratorMonitor.MATCHES.get() + " violations.");
 		UnsafeIteratorMonitor.MATCHES.set(0); // reset counter
 		
 		UnsafeIterator_timestamp = 1;
