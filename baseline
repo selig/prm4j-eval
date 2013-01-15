@@ -1,8 +1,8 @@
 #!/usr/bin/env bash
 
-# runs all benchmark without additions
+# runs all benchmark without additions as baseline
 
-# usage:           ./dacapo
+# usage:           ./baseline
 
 # remember directory where this script is called
 # (some benchmarks need absolute paths)
@@ -32,7 +32,7 @@ for i in {0..15}; do
 	for benchmark in avrora batik eclipse fop h2 jython luindex lusearch pmd sunflow tomcat tradebeans tradesoap xalan ; do
 	STATUS=0
 		while [ $STATUS -eq 0 ]; do
-    		echo "Starting benchmark [pure:$benchmark] measurement $i..."
+    		echo "Starting benchmark [baseline:$benchmark] measurement $i..."
 			java -Xms256M -Xmx2048M \
 				-Dprm4jeval.outputfile=results/baseline.log \
 				-Dprm4jeval.invocation=$i \
