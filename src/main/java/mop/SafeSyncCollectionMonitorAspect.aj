@@ -323,7 +323,7 @@ public aspect SafeSyncCollectionMonitorAspect implements javamoprt.MOPObject {
 		SafeSyncCollectionMapManager = new javamoprt.map.MOPMapManager();
 		SafeSyncCollectionMapManager.start();
 		System.out.println("[JavaMOP.SafeSyncCollection] Started"); // prm4j-eval
-		memoryLogger = new MemoryLogger("logs/javaMOP-SafeSyncCollection.log");  // prm4j-eval
+		memoryLogger = new MemoryLogger(); // prm4j-eval
 	}
 
 	// Declarations for the Lock
@@ -677,6 +677,8 @@ public aspect SafeSyncCollectionMonitorAspect implements javamoprt.MOPObject {
 		
 		SafeSyncCollectionMapManager = new javamoprt.map.MOPMapManager();
 		SafeSyncCollectionMapManager.start();
+		
+		memoryLogger.writeToFile();
 		
 		System.gc();
 		System.gc();

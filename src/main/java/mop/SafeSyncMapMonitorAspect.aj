@@ -383,7 +383,7 @@ public aspect SafeSyncMapMonitorAspect implements javamoprt.MOPObject {
 		SafeSyncMapMapManager = new javamoprt.map.MOPMapManager();
 		SafeSyncMapMapManager.start();
 		System.out.println("[JavaMOP.SafeSyncMap] Started");
-		memoryLogger = new MemoryLogger("logs/javaMOP-SafeSyncMap.log"); // prm4j-eval
+		memoryLogger = new MemoryLogger(); // prm4j-eval
 	}
 
 	// Declarations for the Lock
@@ -984,6 +984,8 @@ public aspect SafeSyncMapMonitorAspect implements javamoprt.MOPObject {
 		
 		SafeSyncMapMapManager = new javamoprt.map.MOPMapManager();
 		SafeSyncMapMapManager.start();
+		
+		memoryLogger.writeToFile();
 		
 		System.gc();
 		System.gc();

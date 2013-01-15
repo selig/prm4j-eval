@@ -336,7 +336,7 @@ public aspect UnsafeMapIteratorMonitorAspect implements javamoprt.MOPObject {
 		UnsafeMapIteratorMapManager = new javamoprt.map.MOPMapManager();
 		UnsafeMapIteratorMapManager.start();
 		System.out.println("[JavaMOP.UnsafeMapIterator] Started"); // prm4j-eval
-		memoryLogger = new MemoryLogger("logs/javaMOP-UnsafeMapIterator.log"); // prm4j-eval
+		memoryLogger = new MemoryLogger(); // prm4j-eval
 	}
 
 	// Declarations for the Lock
@@ -825,6 +825,8 @@ public aspect UnsafeMapIteratorMonitorAspect implements javamoprt.MOPObject {
 		
 		UnsafeMapIteratorMapManager = new javamoprt.map.MOPMapManager();
 		UnsafeMapIteratorMapManager.start();
+		
+		memoryLogger.writeToFile();
 		
 		System.gc();
 		System.gc();

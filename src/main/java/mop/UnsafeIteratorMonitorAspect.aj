@@ -280,7 +280,7 @@ public aspect UnsafeIteratorMonitorAspect implements javamoprt.MOPObject {
 	public UnsafeIteratorMonitorAspect(){
 		UnsafeIteratorMapManager = new javamoprt.map.MOPMapManager();
 		UnsafeIteratorMapManager.start();
-		memoryLogger = new MemoryLogger("logs/javaMOP-UnsafeIteratorMonitor.log"); // prm4j-eval
+		memoryLogger = new MemoryLogger(); // prm4j-eval
 		System.out.println("[JavaMOP.UnsafeIterator] Started"); // prm4j-eval
 	}
 
@@ -535,9 +535,10 @@ public aspect UnsafeIteratorMonitorAspect implements javamoprt.MOPObject {
 		UnsafeIteratorMapManager = new javamoprt.map.MOPMapManager();
 		UnsafeIteratorMapManager.start();
 		
+		memoryLogger.writeToFile();
+		
 		System.gc();
 		System.gc();
-
 	}
 	
 }

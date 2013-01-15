@@ -17,6 +17,8 @@ import java.util.logging.Level;
 import java.util.logging.LogRecord;
 import java.util.logging.Logger;
 
+import org.apache.commons.math3.stat.descriptive.SummaryStatistics;
+
 /**
  * Logs memory consumption to file. Activated by system property "prm4jeval.memoryLogging"
  */
@@ -27,10 +29,21 @@ public class MemoryLogger {
     private long timestamp = 0L;
     private Logger logger;
 
-    MemoryLogger(String outputPath) {
+    private String benchmark;
+    private String parametricProperty;
+    private int invocation;
+
+    private SummaryStatistics memStats;
+
+    MemoryLogger() {
 	if (MEMORY_LOGGING) {
+	    String outputPath = getMandatorySystemProperty("prm4jeval.outputfile") + ".mem.log";
 	    System.out.println("Memory logging activated. Output path: " + outputPath);
+	    benchmark = getMandatorySystemProperty("prm4jeval.benchmark");
+	    parametricProperty = getMandatorySystemProperty("prm4jeval.parametricProperty");
+	    invocation = Integer.parseInt(getMandatorySystemProperty("prm4jeval.invocation"));
 	    logger = getFileLogger(outputPath);
+	    memStats = new SummaryStatistics();
 	} else {
 	    System.out.println("Memory logging not activated.");
 	}
@@ -38,10 +51,28 @@ public class MemoryLogger {
 
     public void logMemoryConsumption() {
 	if (MEMORY_LOGGING && timestamp++ % 100 == 0) {
+	    double memoryConsumption = (((double) (Runtime.getRuntime().totalMemory() / 1024) / 1024) - ((double) (Runtime
+		    .getRuntime().freeMemory() / 1024) / 1024));
+	    memStats.addValue(memoryConsumption);
+	}
+    }
+
+    public void logMemoryConsumptionToFile() {
+	if (MEMORY_LOGGING && timestamp++ % 100 == 0) {
 	    logger.log(Level.INFO, timestamp
 		    + " : "
 		    + (((double) (Runtime.getRuntime().totalMemory() / 1024) / 1024) - ((double) (Runtime.getRuntime()
 			    .freeMemory() / 1024) / 1024)));
+	}
+    }
+
+    public void writeToFile() {
+	if (MEMORY_LOGGING) {
+	    logger.log(
+		    Level.INFO,
+		    String.format("%02d %s %s iter %f %f", invocation, benchmark, parametricProperty,
+			    memStats.getMean(), memStats.getMax()));
+	    memStats.clear();
 	}
     }
 
@@ -73,6 +104,14 @@ public class MemoryLogger {
     static String getSystemProperty(String key, String defaultValue) {
 	final String value = System.getProperty(key);
 	return value != null ? value : defaultValue;
+    }
+
+    static String getMandatorySystemProperty(String key) {
+	final String value = System.getProperty(key);
+	if (value == null) {
+	    throw new RuntimeException("System property [" + key + "] is mandatory but not defined!");
+	}
+	return value;
     }
 
 }

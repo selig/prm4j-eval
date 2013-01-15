@@ -243,7 +243,7 @@ public aspect HasNextMonitorAspect implements javamoprt.MOPObject {
 		HasNextMapManager = new javamoprt.map.MOPMapManager();
 		HasNextMapManager.start();
 		System.out.println("[JavaMOP.HasNext] Started"); // prm4j-eval
-		memoryLogger = new MemoryLogger("logs/javaMOP-HasNext.log"); // prm4j-eval
+		memoryLogger = new MemoryLogger(); // prm4j-eval
 	}
 
 	// Declarations for the Lock
@@ -360,9 +360,10 @@ public aspect HasNextMonitorAspect implements javamoprt.MOPObject {
 		HasNextMapManager = new javamoprt.map.MOPMapManager();
 		HasNextMapManager.start();
 		
-		System.gc();
-		System.gc();
+		memoryLogger.writeToFile();
 		
+		System.gc();
+		System.gc();
 	}
 	
 }
