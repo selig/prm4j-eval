@@ -29,7 +29,7 @@ javac src/main/java/prm4jeval/* -d target/classes -cp $DACAPO:$APACHEMATH:$GUAVA
 jar cf target/jars/Callback.jar -C target/classes .
 
 for i in {0..15}; do
-	for benchmark in avrora batik eclipse fop h2 jython luindex lusearch pmd sunflow tomcat tradebeans tradesoap xalan ; do
+	for benchmark in avrora batik eclipse fop h2 jython luindex pmd sunflow tomcat tradebeans tradesoap xalan ; do
 	STATUS=0
 		while [ $STATUS -eq 0 ]; do
     		echo "Starting benchmark [baseline:$benchmark] measurement $i..."
