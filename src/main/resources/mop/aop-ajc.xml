@@ -5,7 +5,7 @@
 	</aspects>
 	<weaver>
 		<include>org.dacapo.harness.Callback</include>
-		<exclude within="org.dacapo..*" />
+		<exclude within="org.aspectj..*" />
 		<exclude within="mop..*" />
 		<exclude within="prm4jeval..*" />
 		<exclude within="org.apache.commons..*" />

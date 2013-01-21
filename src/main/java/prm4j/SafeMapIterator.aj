@@ -30,7 +30,7 @@ public aspect SafeMapIterator extends Prm4jAspect {
     public SafeMapIterator() {
 	fsm = new FSM_SafeMapIterator();
 	pm = ParametricMonitorFactory.createParametricMonitor(new FSMSpec(fsm.fsm));
-	System.out.println("prm4j: Parametric monitor for 'SafeMapIterator' created!");
+	System.out.println("[prm4j.SafeMapIterator] Created!");
     }
 
     pointcut SafeMapIterator_createColl(Map map) : (call(* Map.values()) || call(* Map.keySet())) && target(map) && prm4jPointcut();

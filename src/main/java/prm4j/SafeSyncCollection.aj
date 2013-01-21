@@ -32,7 +32,7 @@ public aspect SafeSyncCollection extends Prm4jAspect {
     public SafeSyncCollection() {
 	fsm = new FSM_SafeSyncCollection();
 	pm = ParametricMonitorFactory.createParametricMonitor(new FSMSpec(fsm.fsm));
-	System.out.println("prm4j: Parametric monitor for 'SafeSyncCollection' created!");
+	System.out.println("[prm4j.SafeSyncCollection] Created!");
     }
 
     pointcut SafeSyncCollection_sync() :  (call(* Collections.synchr*(..))) && prm4jPointcut();

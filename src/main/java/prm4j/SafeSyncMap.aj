@@ -34,7 +34,7 @@ public aspect SafeSyncMap extends Prm4jAspect {
     public SafeSyncMap() {
 	fsm = new FSM_SafeSyncMap();
 	pm = ParametricMonitorFactory.createParametricMonitor(new FSMSpec(fsm.fsm));
-	System.out.println("prm4j: Parametric monitor for 'SafeSyncMap' created!");
+	System.out.println("[prm4j.SafeSyncMap] Created!");
     }
 
     final Condition threadHoldsLockOnCollection = new Condition() {
