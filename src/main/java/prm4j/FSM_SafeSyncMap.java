@@ -12,6 +12,7 @@ package prm4j;
 
 import java.util.Collection;
 import java.util.Iterator;
+import java.util.Map;
 
 import prm4j.api.Alphabet;
 import prm4j.api.MatchHandler;
@@ -26,10 +27,12 @@ public class FSM_SafeSyncMap {
 
     public final Alphabet alphabet = new Alphabet();
 
+    public final Parameter<Map> m = alphabet.createParameter("m", Map.class);
     public final Parameter<Collection> c = alphabet.createParameter("c", Collection.class);
     public final Parameter<Iterator> i = alphabet.createParameter("i", Iterator.class);
 
-    public final Symbol1<Collection> sync = alphabet.createSymbol1("sync", c);
+    public final Symbol1<Map> sync = alphabet.createSymbol1("sync", m);
+    public final Symbol2<Map, Collection> createSet = alphabet.createSymbol2("createSet", m, c);
     public final Symbol2<Collection, Iterator> asyncCreateIter = alphabet.createSymbol2("asyncCreateIter", c, i);
     public final Symbol2<Collection, Iterator> syncCreateIter = alphabet.createSymbol2("syncCreateIter", c, i);
     public final Symbol1<Iterator> accessIter = alphabet.createSymbol1("accessIter", i);
@@ -41,13 +44,15 @@ public class FSM_SafeSyncMap {
     public final FSMState initial = fsm.createInitialState();
     public final FSMState s1 = fsm.createState();
     public final FSMState s2 = fsm.createState();
+    public final FSMState s3 = fsm.createState();
     public final FSMState error = fsm.createAcceptingState(matchHandler);
 
     public FSM_SafeSyncMap() {
 	initial.addTransition(sync, s1);
-	s1.addTransition(asyncCreateIter, error);
-	s1.addTransition(syncCreateIter, s2);
-	s2.addTransition(accessIter, error);
+	s1.addTransition(createSet, s2);
+	s2.addTransition(asyncCreateIter, error);
+	s2.addTransition(syncCreateIter, s2);
+	s3.addTransition(accessIter, error);
     }
 
 }

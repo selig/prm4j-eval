@@ -11,53 +11,67 @@
 package prm4j;
 
 import java.util.Collection;
+import java.util.Collections;
 import java.util.Iterator;
 import java.util.Map;
+import java.util.Set;
 
 import org.aspectj.lang.annotation.SuppressAjWarnings;
 
+import prm4j.api.Condition;
 import prm4j.api.ParametricMonitor;
 import prm4j.api.ParametricMonitorFactory;
 import prm4j.api.fsm.FSMSpec;
 import org.dacapo.harness.Callback;
 
 @SuppressWarnings("rawtypes")
-@SuppressAjWarnings({"adviceDidNotMatch"})
+@SuppressAjWarnings({ "adviceDidNotMatch" })
 public aspect SafeSyncMap extends Prm4jAspect {
-    
-    final FSM_UnsafeMapIterator fsm;
+
+    final FSM_SafeSyncMap fsm;
     final ParametricMonitor pm;
 
     public SafeSyncMap() {
-	fsm = new FSM_UnsafeMapIterator();
+	fsm = new FSM_SafeSyncMap();
 	pm = ParametricMonitorFactory.createParametricMonitor(new FSMSpec(fsm.fsm));
 	System.out.println("prm4j: Parametric monitor for 'SafeSyncMap' created!");
     }
 
-    pointcut UnsafeMapIterator_createColl(Map map) : (call(* Map.values()) || call(* Map.keySet())) && target(map) && prm4jPointcut();
+    final Condition threadHoldsLockOnCollection = new Condition() {
+	@Override
+	public boolean eval() {
+	    return Thread.holdsLock(getParameterValue(fsm.c));
+	}
+    };
 
-    after(Map map) returning (Collection c) : UnsafeMapIterator_createColl(map) {
-	pm.processEvent(fsm.createColl.createEvent(map, c));
+    final Condition threadHoldsNoLockOnCollection = new Condition() {
+	@Override
+	public boolean eval() {
+	    return !Thread.holdsLock(getParameterValue(fsm.c));
+	}
+    };
+
+    pointcut SafeSyncMap_sync() : (call(* Collections.synchr*(..))) && prm4jPointcut();
+    after () returning (Map syncMap) : SafeSyncMap_sync() {
+	pm.processEvent(fsm.sync.createEvent(syncMap));
     }
 
-    pointcut UnsafeMapIterator_createIter(Collection c) : call(* Collection.iterator()) && target(c) && prm4jPointcut();
-
-    after(Collection c) returning (Iterator i) : UnsafeMapIterator_createIter(c) {
-	pm.processEvent(fsm.createIter.createEvent(c, i));
+    pointcut SafeSyncMap_createSet(Map syncMap) : (call(* Map+.keySet()) && target(syncMap)) && prm4jPointcut();
+    after (Map syncMap) returning (Set mapSet) : SafeSyncMap_createSet(syncMap) {
+	pm.processEvent(fsm.createSet.createEvent(syncMap, mapSet));
     }
 
-    pointcut UnsafeMapIterator_useIter(Iterator i) : call(* Iterator.next()) && target(i) && prm4jPointcut();
-
-    before(Iterator i) : UnsafeMapIterator_useIter(i) {
-	pm.processEvent(fsm.useIter.createEvent(i));
+    pointcut SafeSyncMap_createIter(Set mapSet) : (call(* Collection+.iterator()) && target(mapSet)) && prm4jPointcut();
+    after(Set mapSet) returning (Iterator iter) : SafeSyncMap_createIter(mapSet) {
+	pm.processEvent(fsm.syncCreateIter.createConditionalEvent(mapSet, iter, threadHoldsLockOnCollection));
+	pm.processEvent(fsm.asyncCreateIter.createConditionalEvent(mapSet, iter, threadHoldsNoLockOnCollection));
     }
 
-    pointcut UnsafeMapIterator_updateMap(Map map) : (call(* Map.put*(..)) || call(* Map.putAll*(..)) || call(* Map.clear()) || call(* Map.remove*(..))) && target(map) && prm4jPointcut();
-
-    after(Map map) : UnsafeMapIterator_updateMap(map) {
-	pm.processEvent(fsm.updateMap.createEvent(map));
+    pointcut SafeSyncCollection_accessIter(Iterator i) : (call(* Iterator.*(..)) && target(i)) && prm4jPointcut();
+    before(Iterator i) : SafeSyncCollection_accessIter(i) {
+	pm.processEvent(fsm.accessIter.createConditionalEvent(i, threadHoldsNoLockOnCollection));
     }
-    
+
     before() : execution (* Callback+.stop()) {
 	System.out.println("[prm4j.SafeSyncMap] Stopping and resetting...");
 	pm.reset();
