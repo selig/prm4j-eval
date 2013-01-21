@@ -45,11 +45,24 @@ public class Analysis {
 		    }
 		}, OUTPUT_PATH, "");
 
-	// => output normalized memory measures for all properties
-	// - 0 -- 1 -- ---2 ----- 3 -- 4 ------ 5 --------- 6
-	// [05, xalan, HasNext, mean, 08, 4456.400000, 0.017796]
+	// JAVAMOP => output normalized memory measures for all properties
+	// - 0 -- 1 -- ---2 -------------- 3 ---- 4 ------- 5 ------ 6
+	// - 0 -- 1 -- ---2 -------------- 3 --- mean ---- max -- events
+	// [08 jython SafeSyncCollection iter 74.947705 88.861328 438394]
 
 	final Set<String> skippedFirstLines = new HashSet<String>();
+	CITableWriter.writeCITable( //
+		new TableParser2("logs/javamop.log.mem.log") {
+		    @Override
+		    public void parseLine(String line) {
+			String[] split = line.split(" ");
+			// the first measurement of each invocation will not be counted (warm-up)
+			if (!skippedFirstLines.add(split[0] + " " + split[1] + " " + split[2])) {
+			    put(split[2], split[1], Double.parseDouble(split[4]));
+			}
+		    }
+		}, OUTPUT_PATH, "mean");
+	skippedFirstLines.clear();
 	CITableWriter.writeCITable( //
 		new TableParser2("logs/javamop.log.mem.log") {
 		    @Override
@@ -60,7 +73,8 @@ public class Analysis {
 			    put(split[2], split[1], Double.parseDouble(split[5]));
 			}
 		    }
-		}, OUTPUT_PATH, "");
+		}, OUTPUT_PATH, "max");
+
     }
 
     public static <T> Set<T> set(T... values) {
@@ -70,9 +84,4 @@ public class Analysis {
 	}
 	return set;
     }
-    /**
-     * // - 0 -- 1 -- 2 - 3 -- 4 ------ 5 --------- 6 // [05, xalan, -, mean, 08, 4456.400000, 0.017796] String[] split
-     * = line.split(" "); if (split[2].equals(parametricProperty) && split[3].equals("mean")) { result.put(split[1],
-     * Double.parseDouble(split[5]) / 1000); }
-     **/
 }
