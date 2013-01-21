@@ -23,7 +23,7 @@ import prm4j.api.fsm.FSM;
 import prm4j.api.fsm.FSMState;
 
 @SuppressWarnings("rawtypes")
-public class FSM_UnsafeMapIterator {
+public class FSM_SafeMapIterator {
 
 	public final Alphabet alphabet = new Alphabet();
 
@@ -46,7 +46,7 @@ public class FSM_UnsafeMapIterator {
 	public final FSMState s3 = fsm.createState();
 	public final FSMState error = fsm.createAcceptingState(matchHandler);
 
-	public FSM_UnsafeMapIterator() {
+	public FSM_SafeMapIterator() {
 	    initial.addTransition(createColl, s1);
 	    initial.addTransition(updateMap, initial);
 	    s1.addTransition(updateMap, s1);
