@@ -8,7 +8,7 @@
  * Contributors:
  * Mateusz Parzonka - initial API and implementation
  */
-package prm4jeval;
+package prm4jeval.dataanalysis;
 
 import java.io.Serializable;
 
