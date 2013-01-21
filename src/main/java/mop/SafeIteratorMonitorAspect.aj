@@ -4,12 +4,12 @@ import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.locks.*;
 import javamoprt.*;
 
-class UnsafeIteratorMonitor_Set extends javamoprt.MOPSet {
-	protected UnsafeIteratorMonitor[] elementData;
+class SafeIteratorMonitor_Set extends javamoprt.MOPSet {
+	protected SafeIteratorMonitor[] elementData;
 
-	public UnsafeIteratorMonitor_Set(){
+	public SafeIteratorMonitor_Set(){
 		this.size = 0;
-		this.elementData = new UnsafeIteratorMonitor[4];
+		this.elementData = new SafeIteratorMonitor[4];
 	}
 
 	public final int size(){
@@ -21,14 +21,14 @@ class UnsafeIteratorMonitor_Set extends javamoprt.MOPSet {
 
 	public final boolean add(MOPMonitor e){
 		ensureCapacity();
-		elementData[size++] = (UnsafeIteratorMonitor)e;
+		elementData[size++] = (SafeIteratorMonitor)e;
 		return true;
 	}
 
 	public final void endObject(int idnum){
 		int numAlive = 0;
 		for(int i = 0; i < size; i++){
-			UnsafeIteratorMonitor monitor = elementData[i];
+			SafeIteratorMonitor monitor = elementData[i];
 			if(!monitor.MOP_terminated){
 				monitor.endObject(idnum);
 			}
@@ -71,7 +71,7 @@ class UnsafeIteratorMonitor_Set extends javamoprt.MOPSet {
 			cleanup();
 		}
 		if (size + 1 > oldCapacity) {
-			UnsafeIteratorMonitor[] oldData = elementData;
+			SafeIteratorMonitor[] oldData = elementData;
 			int newCapacity = (oldCapacity * 3) / 2 + 1;
 			if (newCapacity < size + 1){
 				newCapacity = size + 1;
@@ -83,7 +83,7 @@ class UnsafeIteratorMonitor_Set extends javamoprt.MOPSet {
 	public final void cleanup() {
 		int numAlive = 0 ;
 		for(int i = 0; i < size; i++){
-			UnsafeIteratorMonitor monitor = (UnsafeIteratorMonitor)elementData[i];
+			SafeIteratorMonitor monitor = (SafeIteratorMonitor)elementData[i];
 			if(!monitor.MOP_terminated){
 				elementData[numAlive] = monitor;
 				numAlive++;
@@ -98,7 +98,7 @@ class UnsafeIteratorMonitor_Set extends javamoprt.MOPSet {
 	public final void event_create(Collection c, Iterator i) {
 		int numAlive = 0 ;
 		for(int i_1 = 0; i_1 < this.size; i_1++){
-			UnsafeIteratorMonitor monitor = (UnsafeIteratorMonitor)this.elementData[i_1];
+			SafeIteratorMonitor monitor = (SafeIteratorMonitor)this.elementData[i_1];
 			if(!monitor.MOP_terminated){
 				elementData[numAlive] = monitor;
 				numAlive++;
@@ -118,7 +118,7 @@ class UnsafeIteratorMonitor_Set extends javamoprt.MOPSet {
 	public final void event_updatesource(Collection c) {
 		int numAlive = 0 ;
 		for(int i_1 = 0; i_1 < this.size; i_1++){
-			UnsafeIteratorMonitor monitor = (UnsafeIteratorMonitor)this.elementData[i_1];
+			SafeIteratorMonitor monitor = (SafeIteratorMonitor)this.elementData[i_1];
 			if(!monitor.MOP_terminated){
 				elementData[numAlive] = monitor;
 				numAlive++;
@@ -138,7 +138,7 @@ class UnsafeIteratorMonitor_Set extends javamoprt.MOPSet {
 	public final void event_next(Iterator i) {
 		int numAlive = 0 ;
 		for(int i_1 = 0; i_1 < this.size; i_1++){
-			UnsafeIteratorMonitor monitor = (UnsafeIteratorMonitor)this.elementData[i_1];
+			SafeIteratorMonitor monitor = (SafeIteratorMonitor)this.elementData[i_1];
 			if(!monitor.MOP_terminated){
 				elementData[numAlive] = monitor;
 				numAlive++;
@@ -156,7 +156,7 @@ class UnsafeIteratorMonitor_Set extends javamoprt.MOPSet {
 	}
 }
 
-class UnsafeIteratorMonitor extends javamoprt.MOPMonitor implements Cloneable, javamoprt.MOPObject {
+class SafeIteratorMonitor extends javamoprt.MOPMonitor implements Cloneable, javamoprt.MOPObject {
     
     	/**
     	 *  prm4j-eval: Measures number of matches.
@@ -166,7 +166,7 @@ class UnsafeIteratorMonitor extends javamoprt.MOPMonitor implements Cloneable, j
 	public long tau = -1;
 	public Object clone() {
 		try {
-			UnsafeIteratorMonitor ret = (UnsafeIteratorMonitor) super.clone();
+			SafeIteratorMonitor ret = (SafeIteratorMonitor) super.clone();
 			return ret;
 		}
 		catch (CloneNotSupportedException e) {
@@ -181,7 +181,7 @@ class UnsafeIteratorMonitor extends javamoprt.MOPMonitor implements Cloneable, j
 
 	boolean Prop_1_Category_match = false;
 
-	public UnsafeIteratorMonitor () {
+	public SafeIteratorMonitor () {
 		Prop_1_state = 0;
 
 	}
@@ -274,269 +274,269 @@ class UnsafeIteratorMonitor extends javamoprt.MOPMonitor implements Cloneable, j
 
 }
 
-public aspect UnsafeIteratorMonitorAspect implements javamoprt.MOPObject {
-	javamoprt.map.MOPMapManager UnsafeIteratorMapManager;
+public aspect SafeIteratorMonitorAspect implements javamoprt.MOPObject {
+	javamoprt.map.MOPMapManager SafeIteratorMapManager;
 	private final MemoryLogger memoryLogger; // prm4j-eval
-	public UnsafeIteratorMonitorAspect(){
-		UnsafeIteratorMapManager = new javamoprt.map.MOPMapManager();
-		UnsafeIteratorMapManager.start();
+	public SafeIteratorMonitorAspect(){
+		SafeIteratorMapManager = new javamoprt.map.MOPMapManager();
+		SafeIteratorMapManager.start();
 		memoryLogger = new MemoryLogger(); // prm4j-eval
-		System.out.println("[JavaMOP.UnsafeIterator] Started"); // prm4j-eval
+		System.out.println("[JavaMOP.SafeIterator] Started"); // prm4j-eval
 	}
 
 	// Declarations for the Lock
-	static ReentrantLock UnsafeIterator_MOPLock = new ReentrantLock();
-	static Condition UnsafeIterator_MOPLock_cond = UnsafeIterator_MOPLock.newCondition();
+	static ReentrantLock SafeIterator_MOPLock = new ReentrantLock();
+	static Condition SafeIterator_MOPLock_cond = SafeIterator_MOPLock.newCondition();
 
 	// Declarations for Timestamps
-	static long UnsafeIterator_timestamp = 1;
+	static long SafeIterator_timestamp = 1;
 
-	static boolean UnsafeIterator_activated = false;
+	static boolean SafeIterator_activated = false;
 
 	// Declarations for Indexing Trees
-	static javamoprt.ref.MOPTagWeakReference UnsafeIterator_c_Map_cachekey_0 = javamoprt.map.MOPTagRefMap.NULRef;
-	static UnsafeIteratorMonitor_Set UnsafeIterator_c_Map_cacheset = null;
-	static UnsafeIteratorMonitor UnsafeIterator_c_Map_cachenode = null;
-	static javamoprt.map.MOPAbstractMap UnsafeIterator_c_i_Map = new javamoprt.map.MOPMapOfAll(0);
-	static javamoprt.ref.MOPTagWeakReference UnsafeIterator_c_i_Map_cachekey_0 = javamoprt.map.MOPTagRefMap.NULRef;
-	static javamoprt.ref.MOPTagWeakReference UnsafeIterator_c_i_Map_cachekey_1 = javamoprt.map.MOPTagRefMap.NULRef;
-	static UnsafeIteratorMonitor UnsafeIterator_c_i_Map_cachenode = null;
-	static javamoprt.map.MOPAbstractMap UnsafeIterator_i_Map = new javamoprt.map.MOPMapOfSetMon(1);
-	static javamoprt.ref.MOPTagWeakReference UnsafeIterator_i_Map_cachekey_1 = javamoprt.map.MOPTagRefMap.NULRef;
-	static UnsafeIteratorMonitor_Set UnsafeIterator_i_Map_cacheset = null;
-	static UnsafeIteratorMonitor UnsafeIterator_i_Map_cachenode = null;
+	static javamoprt.ref.MOPTagWeakReference SafeIterator_c_Map_cachekey_0 = javamoprt.map.MOPTagRefMap.NULRef;
+	static SafeIteratorMonitor_Set SafeIterator_c_Map_cacheset = null;
+	static SafeIteratorMonitor SafeIterator_c_Map_cachenode = null;
+	static javamoprt.map.MOPAbstractMap SafeIterator_c_i_Map = new javamoprt.map.MOPMapOfAll(0);
+	static javamoprt.ref.MOPTagWeakReference SafeIterator_c_i_Map_cachekey_0 = javamoprt.map.MOPTagRefMap.NULRef;
+	static javamoprt.ref.MOPTagWeakReference SafeIterator_c_i_Map_cachekey_1 = javamoprt.map.MOPTagRefMap.NULRef;
+	static SafeIteratorMonitor SafeIterator_c_i_Map_cachenode = null;
+	static javamoprt.map.MOPAbstractMap SafeIterator_i_Map = new javamoprt.map.MOPMapOfSetMon(1);
+	static javamoprt.ref.MOPTagWeakReference SafeIterator_i_Map_cachekey_1 = javamoprt.map.MOPTagRefMap.NULRef;
+	static SafeIteratorMonitor_Set SafeIterator_i_Map_cacheset = null;
+	static SafeIteratorMonitor SafeIterator_i_Map_cachenode = null;
 
 	// Trees for References
-	static javamoprt.map.MOPRefMap UnsafeIterator_Collection_RefMap = new javamoprt.map.MOPTagRefMap();
-	static javamoprt.map.MOPRefMap UnsafeIterator_Iterator_RefMap = new javamoprt.map.MOPTagRefMap();
+	static javamoprt.map.MOPRefMap SafeIterator_Collection_RefMap = new javamoprt.map.MOPTagRefMap();
+	static javamoprt.map.MOPRefMap SafeIterator_Iterator_RefMap = new javamoprt.map.MOPTagRefMap();
 
 	pointcut MOP_CommonPointCut() : !within(javamoprt.MOPObject+) && !adviceexecution();
-	pointcut UnsafeIterator_create(Collection c) : (call(Iterator Collection+.iterator()) && target(c)) && MOP_CommonPointCut();
-	after (Collection c) returning (Iterator i) : UnsafeIterator_create(c) {
-		UnsafeIterator_activated = true;
-		while (!UnsafeIterator_MOPLock.tryLock()) {
+	pointcut SafeIterator_create(Collection c) : (call(Iterator Collection+.iterator()) && target(c)) && MOP_CommonPointCut();
+	after (Collection c) returning (Iterator i) : SafeIterator_create(c) {
+		SafeIterator_activated = true;
+		while (!SafeIterator_MOPLock.tryLock()) {
 			Thread.yield();
 		}
 		memoryLogger.logMemoryConsumption(); // prm4j-eval
 		Object obj;
 		javamoprt.map.MOPMap tempMap;
-		UnsafeIteratorMonitor mainMonitor = null;
+		SafeIteratorMonitor mainMonitor = null;
 		javamoprt.map.MOPMap mainMap = null;
-		UnsafeIteratorMonitor_Set monitors = null;
+		SafeIteratorMonitor_Set monitors = null;
 		javamoprt.ref.MOPTagWeakReference TempRef_c;
 		javamoprt.ref.MOPTagWeakReference TempRef_i;
 
 		// Cache Retrieval
-		if (c == UnsafeIterator_c_i_Map_cachekey_0.get() && i == UnsafeIterator_c_i_Map_cachekey_1.get()) {
-			TempRef_c = UnsafeIterator_c_i_Map_cachekey_0;
-			TempRef_i = UnsafeIterator_c_i_Map_cachekey_1;
+		if (c == SafeIterator_c_i_Map_cachekey_0.get() && i == SafeIterator_c_i_Map_cachekey_1.get()) {
+			TempRef_c = SafeIterator_c_i_Map_cachekey_0;
+			TempRef_i = SafeIterator_c_i_Map_cachekey_1;
 
-			mainMonitor = UnsafeIterator_c_i_Map_cachenode;
+			mainMonitor = SafeIterator_c_i_Map_cachenode;
 		} else {
-			TempRef_c = UnsafeIterator_Collection_RefMap.getTagRef(c);
-			TempRef_i = UnsafeIterator_Iterator_RefMap.getTagRef(i);
+			TempRef_c = SafeIterator_Collection_RefMap.getTagRef(c);
+			TempRef_i = SafeIterator_Iterator_RefMap.getTagRef(i);
 		}
 
 		if (mainMonitor == null) {
-			tempMap = UnsafeIterator_c_i_Map;
+			tempMap = SafeIterator_c_i_Map;
 			obj = tempMap.getMap(TempRef_c);
 			if (obj == null) {
 				obj = new javamoprt.map.MOPMapOfMonitor(1);
 				tempMap.putMap(TempRef_c, obj);
 			}
 			mainMap = (javamoprt.map.MOPAbstractMap)obj;
-			mainMonitor = (UnsafeIteratorMonitor)mainMap.getNode(TempRef_i);
+			mainMonitor = (SafeIteratorMonitor)mainMap.getNode(TempRef_i);
 
 			if (mainMonitor == null) {
-				mainMonitor = new UnsafeIteratorMonitor();
+				mainMonitor = new SafeIteratorMonitor();
 
 				mainMonitor.MOPRef_c = TempRef_c;
 				mainMonitor.MOPRef_i = TempRef_i;
 
 				mainMap.putNode(TempRef_i, mainMonitor);
-				mainMonitor.tau = UnsafeIterator_timestamp;
+				mainMonitor.tau = SafeIterator_timestamp;
 				if (TempRef_c.tau == -1){
-					TempRef_c.tau = UnsafeIterator_timestamp;
+					TempRef_c.tau = SafeIterator_timestamp;
 				}
 				if (TempRef_i.tau == -1){
-					TempRef_i.tau = UnsafeIterator_timestamp;
+					TempRef_i.tau = SafeIterator_timestamp;
 				}
-				UnsafeIterator_timestamp++;
+				SafeIterator_timestamp++;
 
-				tempMap = UnsafeIterator_c_i_Map;
+				tempMap = SafeIterator_c_i_Map;
 				obj = tempMap.getSet(TempRef_c);
-				monitors = (UnsafeIteratorMonitor_Set)obj;
+				monitors = (SafeIteratorMonitor_Set)obj;
 				if (monitors == null) {
-					monitors = new UnsafeIteratorMonitor_Set();
+					monitors = new SafeIteratorMonitor_Set();
 					tempMap.putSet(TempRef_c, monitors);
 				}
 				monitors.add(mainMonitor);
 
-				tempMap = UnsafeIterator_i_Map;
+				tempMap = SafeIterator_i_Map;
 				obj = tempMap.getSet(TempRef_i);
-				monitors = (UnsafeIteratorMonitor_Set)obj;
+				monitors = (SafeIteratorMonitor_Set)obj;
 				if (monitors == null) {
-					monitors = new UnsafeIteratorMonitor_Set();
+					monitors = new SafeIteratorMonitor_Set();
 					tempMap.putSet(TempRef_i, monitors);
 				}
 				monitors.add(mainMonitor);
 			}
 
-			UnsafeIterator_c_i_Map_cachekey_0 = TempRef_c;
-			UnsafeIterator_c_i_Map_cachekey_1 = TempRef_i;
-			UnsafeIterator_c_i_Map_cachenode = mainMonitor;
+			SafeIterator_c_i_Map_cachekey_0 = TempRef_c;
+			SafeIterator_c_i_Map_cachekey_1 = TempRef_i;
+			SafeIterator_c_i_Map_cachenode = mainMonitor;
 		}
 
 		mainMonitor.Prop_1_event_create(c, i);
 		if(mainMonitor.Prop_1_Category_match) {
 			mainMonitor.Prop_1_handler_match(c, i);
 		}
-		UnsafeIterator_MOPLock.unlock();
+		SafeIterator_MOPLock.unlock();
 	}
 
-	pointcut UnsafeIterator_updatesource(Collection c) : ((call(* Collection+.remove*(..)) || call(* Collection+.add*(..))) && target(c)) && MOP_CommonPointCut();
-	after (Collection c) : UnsafeIterator_updatesource(c) {
-		UnsafeIterator_activated = true;
-		while (!UnsafeIterator_MOPLock.tryLock()) {
+	pointcut SafeIterator_updatesource(Collection c) : ((call(* Collection+.remove*(..)) || call(* Collection+.add*(..))) && target(c)) && MOP_CommonPointCut();
+	after (Collection c) : SafeIterator_updatesource(c) {
+		SafeIterator_activated = true;
+		while (!SafeIterator_MOPLock.tryLock()) {
 			Thread.yield();
 		}
 		memoryLogger.logMemoryConsumption();  // prm4j-eval
-		UnsafeIteratorMonitor mainMonitor = null;
+		SafeIteratorMonitor mainMonitor = null;
 		javamoprt.map.MOPMap mainMap = null;
-		UnsafeIteratorMonitor_Set mainSet = null;
+		SafeIteratorMonitor_Set mainSet = null;
 		javamoprt.ref.MOPTagWeakReference TempRef_c;
 
 		// Cache Retrieval
-		if (c == UnsafeIterator_c_Map_cachekey_0.get()) {
-			TempRef_c = UnsafeIterator_c_Map_cachekey_0;
+		if (c == SafeIterator_c_Map_cachekey_0.get()) {
+			TempRef_c = SafeIterator_c_Map_cachekey_0;
 
-			mainSet = UnsafeIterator_c_Map_cacheset;
-			mainMonitor = UnsafeIterator_c_Map_cachenode;
+			mainSet = SafeIterator_c_Map_cacheset;
+			mainMonitor = SafeIterator_c_Map_cachenode;
 		} else {
-			TempRef_c = UnsafeIterator_Collection_RefMap.getTagRef(c);
+			TempRef_c = SafeIterator_Collection_RefMap.getTagRef(c);
 		}
 
 		if (mainSet == null || mainMonitor == null) {
-			mainMap = UnsafeIterator_c_i_Map;
-			mainMonitor = (UnsafeIteratorMonitor)mainMap.getNode(TempRef_c);
-			mainSet = (UnsafeIteratorMonitor_Set)mainMap.getSet(TempRef_c);
+			mainMap = SafeIterator_c_i_Map;
+			mainMonitor = (SafeIteratorMonitor)mainMap.getNode(TempRef_c);
+			mainSet = (SafeIteratorMonitor_Set)mainMap.getSet(TempRef_c);
 			if (mainSet == null){
-				mainSet = new UnsafeIteratorMonitor_Set();
+				mainSet = new SafeIteratorMonitor_Set();
 				mainMap.putSet(TempRef_c, mainSet);
 			}
 
 			if (mainMonitor == null) {
-				mainMonitor = new UnsafeIteratorMonitor();
+				mainMonitor = new SafeIteratorMonitor();
 
 				mainMonitor.MOPRef_c = TempRef_c;
 
-				UnsafeIterator_c_i_Map.putNode(TempRef_c, mainMonitor);
+				SafeIterator_c_i_Map.putNode(TempRef_c, mainMonitor);
 				mainSet.add(mainMonitor);
-				mainMonitor.tau = UnsafeIterator_timestamp;
+				mainMonitor.tau = SafeIterator_timestamp;
 				if (TempRef_c.tau == -1){
-					TempRef_c.tau = UnsafeIterator_timestamp;
+					TempRef_c.tau = SafeIterator_timestamp;
 				}
-				UnsafeIterator_timestamp++;
+				SafeIterator_timestamp++;
 			}
 
-			UnsafeIterator_c_Map_cachekey_0 = TempRef_c;
-			UnsafeIterator_c_Map_cacheset = mainSet;
-			UnsafeIterator_c_Map_cachenode = mainMonitor;
+			SafeIterator_c_Map_cachekey_0 = TempRef_c;
+			SafeIterator_c_Map_cacheset = mainSet;
+			SafeIterator_c_Map_cachenode = mainMonitor;
 		}
 
 		if(mainSet != null) {
 			mainSet.event_updatesource(c);
 		}
-		UnsafeIterator_MOPLock.unlock();
+		SafeIterator_MOPLock.unlock();
 	}
 
-	pointcut UnsafeIterator_next(Iterator i) : (call(* Iterator.next()) && target(i)) && MOP_CommonPointCut();
-	before (Iterator i) : UnsafeIterator_next(i) {
-		UnsafeIterator_activated = true;
-		while (!UnsafeIterator_MOPLock.tryLock()) {
+	pointcut SafeIterator_next(Iterator i) : (call(* Iterator.next()) && target(i)) && MOP_CommonPointCut();
+	before (Iterator i) : SafeIterator_next(i) {
+		SafeIterator_activated = true;
+		while (!SafeIterator_MOPLock.tryLock()) {
 			Thread.yield();
 		}
 		memoryLogger.logMemoryConsumption(); // prm4j-eval
-		UnsafeIteratorMonitor mainMonitor = null;
+		SafeIteratorMonitor mainMonitor = null;
 		javamoprt.map.MOPMap mainMap = null;
-		UnsafeIteratorMonitor_Set mainSet = null;
+		SafeIteratorMonitor_Set mainSet = null;
 		javamoprt.ref.MOPTagWeakReference TempRef_i;
 
 		// Cache Retrieval
-		if (i == UnsafeIterator_i_Map_cachekey_1.get()) {
-			TempRef_i = UnsafeIterator_i_Map_cachekey_1;
+		if (i == SafeIterator_i_Map_cachekey_1.get()) {
+			TempRef_i = SafeIterator_i_Map_cachekey_1;
 
-			mainSet = UnsafeIterator_i_Map_cacheset;
-			mainMonitor = UnsafeIterator_i_Map_cachenode;
+			mainSet = SafeIterator_i_Map_cacheset;
+			mainMonitor = SafeIterator_i_Map_cachenode;
 		} else {
-			TempRef_i = UnsafeIterator_Iterator_RefMap.getTagRef(i);
+			TempRef_i = SafeIterator_Iterator_RefMap.getTagRef(i);
 		}
 
 		if (mainSet == null || mainMonitor == null) {
-			mainMap = UnsafeIterator_i_Map;
-			mainMonitor = (UnsafeIteratorMonitor)mainMap.getNode(TempRef_i);
-			mainSet = (UnsafeIteratorMonitor_Set)mainMap.getSet(TempRef_i);
+			mainMap = SafeIterator_i_Map;
+			mainMonitor = (SafeIteratorMonitor)mainMap.getNode(TempRef_i);
+			mainSet = (SafeIteratorMonitor_Set)mainMap.getSet(TempRef_i);
 			if (mainSet == null){
-				mainSet = new UnsafeIteratorMonitor_Set();
+				mainSet = new SafeIteratorMonitor_Set();
 				mainMap.putSet(TempRef_i, mainSet);
 			}
 
 			if (mainMonitor == null) {
-				mainMonitor = new UnsafeIteratorMonitor();
+				mainMonitor = new SafeIteratorMonitor();
 
 				mainMonitor.MOPRef_i = TempRef_i;
 
-				UnsafeIterator_i_Map.putNode(TempRef_i, mainMonitor);
+				SafeIterator_i_Map.putNode(TempRef_i, mainMonitor);
 				mainSet.add(mainMonitor);
-				mainMonitor.tau = UnsafeIterator_timestamp;
+				mainMonitor.tau = SafeIterator_timestamp;
 				if (TempRef_i.tau == -1){
-					TempRef_i.tau = UnsafeIterator_timestamp;
+					TempRef_i.tau = SafeIterator_timestamp;
 				}
-				UnsafeIterator_timestamp++;
+				SafeIterator_timestamp++;
 			}
 
-			UnsafeIterator_i_Map_cachekey_1 = TempRef_i;
-			UnsafeIterator_i_Map_cacheset = mainSet;
-			UnsafeIterator_i_Map_cachenode = mainMonitor;
+			SafeIterator_i_Map_cachekey_1 = TempRef_i;
+			SafeIterator_i_Map_cacheset = mainSet;
+			SafeIterator_i_Map_cachenode = mainMonitor;
 		}
 
 		if(mainSet != null) {
 			mainSet.event_next(i);
 		}
-		UnsafeIterator_MOPLock.unlock();
+		SafeIterator_MOPLock.unlock();
 	}
 	
 	/**
 	 *  prm4j-eval: resets the parametric monitor
 	 */
 	after() : execution (* org.dacapo.harness.Callback+.stop()) {
-		System.out.println("[JavaMOP.UnsafeIterator] Resetting... Reported " + UnsafeIteratorMonitor.MATCHES.get() + " violations.");
+		System.out.println("[JavaMOP.SafeIterator] Resetting... Reported " + SafeIteratorMonitor.MATCHES.get() + " violations.");
 
 		memoryLogger.reallyLogMemoryConsumption(); // so we have at least two values
 		
-		UnsafeIteratorMonitor.MATCHES.set(0); // reset counter
+		SafeIteratorMonitor.MATCHES.set(0); // reset counter
 		
-		UnsafeIterator_timestamp = 1;
+		SafeIterator_timestamp = 1;
 
-		UnsafeIterator_activated = false;
+		SafeIterator_activated = false;
 
-		UnsafeIterator_c_Map_cachekey_0 = javamoprt.map.MOPTagRefMap.NULRef;
-		UnsafeIterator_c_Map_cacheset = null;
-		UnsafeIterator_c_Map_cachenode = null;
-		UnsafeIterator_c_i_Map = new javamoprt.map.MOPMapOfAll(0);
-		UnsafeIterator_c_i_Map_cachekey_0 = javamoprt.map.MOPTagRefMap.NULRef;
-		UnsafeIterator_c_i_Map_cachekey_1 = javamoprt.map.MOPTagRefMap.NULRef;
-		UnsafeIterator_c_i_Map_cachenode = null;
-		UnsafeIterator_i_Map = new javamoprt.map.MOPMapOfSetMon(1);
-		UnsafeIterator_i_Map_cachekey_1 = javamoprt.map.MOPTagRefMap.NULRef;
-		UnsafeIterator_i_Map_cacheset = null;
-		UnsafeIterator_i_Map_cachenode = null;
+		SafeIterator_c_Map_cachekey_0 = javamoprt.map.MOPTagRefMap.NULRef;
+		SafeIterator_c_Map_cacheset = null;
+		SafeIterator_c_Map_cachenode = null;
+		SafeIterator_c_i_Map = new javamoprt.map.MOPMapOfAll(0);
+		SafeIterator_c_i_Map_cachekey_0 = javamoprt.map.MOPTagRefMap.NULRef;
+		SafeIterator_c_i_Map_cachekey_1 = javamoprt.map.MOPTagRefMap.NULRef;
+		SafeIterator_c_i_Map_cachenode = null;
+		SafeIterator_i_Map = new javamoprt.map.MOPMapOfSetMon(1);
+		SafeIterator_i_Map_cachekey_1 = javamoprt.map.MOPTagRefMap.NULRef;
+		SafeIterator_i_Map_cacheset = null;
+		SafeIterator_i_Map_cachenode = null;
 
-		UnsafeIterator_Collection_RefMap = new javamoprt.map.MOPTagRefMap();
-		UnsafeIterator_Iterator_RefMap = new javamoprt.map.MOPTagRefMap();
+		SafeIterator_Collection_RefMap = new javamoprt.map.MOPTagRefMap();
+		SafeIterator_Iterator_RefMap = new javamoprt.map.MOPTagRefMap();
 		
-		UnsafeIteratorMapManager = new javamoprt.map.MOPMapManager();
-		UnsafeIteratorMapManager.start();
+		SafeIteratorMapManager = new javamoprt.map.MOPMapManager();
+		SafeIteratorMapManager.start();
 		
 		memoryLogger.writeToFile();
 		

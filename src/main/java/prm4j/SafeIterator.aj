@@ -28,11 +28,11 @@ import prm4j.api.fsm.FSMSpec;
 import prm4j.api.fsm.FSMState;
 
 /**
- * Standalone version (= with integrated fsm) of the UnsafeIterator pattern.
+ * Standalone version (= with integrated fsm) of the SafeIterator pattern.
  */
 @SuppressWarnings("rawtypes")
 @SuppressAjWarnings({ "adviceDidNotMatch" })
-public aspect UnsafeIterator extends Prm4jAspect {
+public aspect SafeIterator extends Prm4jAspect {
     
     private final ParametricMonitor pm;
     private final Alphabet alphabet = new Alphabet();
@@ -51,7 +51,7 @@ public aspect UnsafeIterator extends Prm4jAspect {
     
     final FSM fsm = new FSM(alphabet);
 
-    public UnsafeIterator() {
+    public SafeIterator() {
 	
 	
 	
@@ -72,7 +72,7 @@ public aspect UnsafeIterator extends Prm4jAspect {
 	// parametric monitor creation
 	pm = ParametricMonitorFactory.createParametricMonitor(new FSMSpec(fsm));
 	
-	System.out.println("[prm4j.UnsafeIterator] Created!");
+	System.out.println("[prm4j.SafeIterator] Created!");
     }
 
     after(Collection c) returning (Iterator i) : (call(Iterator Collection+.iterator()) && target(c)) && prm4jPointcut() {
@@ -88,11 +88,11 @@ public aspect UnsafeIterator extends Prm4jAspect {
     }
 
     before() : execution (* Callback+.start(String)) {
-	System.out.println("[prm4j.UnsafeIterator] Starting...");
+	System.out.println("[prm4j.SafeIterator] Starting...");
     }
 
     before() : execution (* Callback+.stop()) {
-	System.out.println("[prm4j.UnsafeIterator] Stopping and resetting...");
+	System.out.println("[prm4j.SafeIterator] Stopping and resetting...");
 	pm.reset();
 	System.gc();
 	System.gc();
