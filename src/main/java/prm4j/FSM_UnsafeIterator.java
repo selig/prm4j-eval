@@ -29,23 +29,26 @@ public class FSM_UnsafeIterator {
 	public final Parameter<Collection> c = alphabet.createParameter("c", Collection.class);
 	public final Parameter<Iterator> i = alphabet.createParameter("i", Iterator.class);
 
-	public final Symbol2<Collection, Iterator> create = alphabet.createSymbol2("create", c, i);
-	public final Symbol1<Collection> updateSource = alphabet.createSymbol1("updateSource", c);
-	public final Symbol1<Iterator> next = alphabet.createSymbol1("next", i);
+	public final Symbol2<Collection, Iterator> createIter = alphabet.createSymbol2("createIter", c, i);
+	public final Symbol1<Collection> updateColl = alphabet.createSymbol1("updateColl", c);
+	public final Symbol1<Iterator> useIter = alphabet.createSymbol1("useIter", i);
 
 	public final FSM fsm = new FSM(alphabet);
+
+	public final  MatchHandler matchHandler = MatchHandler.SYS_OUT;
 
 	public final FSMState initial = fsm.createInitialState();
 	public final FSMState s1 = fsm.createState();
 	public final FSMState s2 = fsm.createState();
 	public final FSMState s3 = fsm.createState();
-	public final FSMState error = fsm.createAcceptingState(MatchHandler.SYS_OUT);
+	public final FSMState error = fsm.createAcceptingState(matchHandler);
 
 	public FSM_UnsafeIterator() {
-	    initial.addTransition(create, s1);
-	    s1.addTransition(next, s1);
-	    s1.addTransition(updateSource, s2);
-	    s2.addTransition(updateSource, s2);
-	    s2.addTransition(next, error);
+	    initial.addTransition(createIter, s1);
+	    initial.addTransition(updateColl, initial);
+	    s1.addTransition(useIter, s1);
+	    s1.addTransition(updateColl, s2);
+	    s2.addTransition(updateColl, s2);
+	    s2.addTransition(useIter, error);
 	}
 }

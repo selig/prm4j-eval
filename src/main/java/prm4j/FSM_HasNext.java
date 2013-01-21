@@ -14,7 +14,6 @@ import java.util.Iterator;
 
 import prm4j.api.Alphabet;
 import prm4j.api.MatchHandler;
-import prm4j.api.MatchHandler.MatchCounter;
 import prm4j.api.Parameter;
 import prm4j.api.Symbol1;
 import prm4j.api.fsm.FSM;
@@ -32,11 +31,11 @@ public class FSM_HasNext {
 
 	public final FSM fsm = new FSM(alphabet);
 
-	public final  MatchCounter matchCounter = MatchHandler.MATCH_COUNTER;
+	public final  MatchHandler matchHandler = MatchHandler.SYS_OUT;
 
 	public final FSMState initial = fsm.createInitialState();
 	public final FSMState safe = fsm.createState();
-	public final FSMState error = fsm.createAcceptingState(matchCounter);
+	public final FSMState error = fsm.createAcceptingState(matchHandler);
 
 	public FSM_HasNext() {
 	    initial.addTransition(hasNext, safe);

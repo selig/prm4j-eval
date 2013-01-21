@@ -13,17 +13,14 @@ package prm4j;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Iterator;
-import java.util.logging.Level;
 
 import org.aspectj.lang.annotation.SuppressAjWarnings;
+import org.dacapo.harness.Callback;
 
 import prm4j.api.Condition;
 import prm4j.api.ParametricMonitor;
 import prm4j.api.ParametricMonitorFactory;
 import prm4j.api.fsm.FSMSpec;
-import prm4j.indexing.realtime.AwareParametricMonitor;
-
-import org.dacapo.harness.Callback;
 
 @SuppressWarnings("rawtypes")
 @SuppressAjWarnings({"adviceDidNotMatch"})
@@ -71,8 +68,6 @@ public aspect SafeSyncCollection extends Prm4jAspect {
 
     before() : execution (* Callback+.stop()) {
 	System.out.println("[prm4j.SafeSyncCollection] Stopping and resetting...");
-	((AwareParametricMonitor) pm).getLogger().log(Level.INFO, "Matches: " + fsm.matchCounter.getCounter().get());
-	fsm.matchCounter.getCounter().set(0);
 	pm.reset();
 	System.gc();
 	System.gc();

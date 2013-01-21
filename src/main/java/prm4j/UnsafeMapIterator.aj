@@ -59,7 +59,6 @@ public aspect UnsafeMapIterator extends Prm4jAspect {
     
     before() : execution (* org.dacapo.harness.Callback+.stop()) {
   	System.out.println("[prm4j.UnsafeMapIterator] Stopping and resetting...");
-	fsm.matchCounter.getCounter().set(0);
 	pm.reset();
 	System.gc();
 	System.gc();

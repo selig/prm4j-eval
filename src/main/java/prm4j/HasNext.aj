@@ -45,9 +45,7 @@ public aspect HasNext extends Prm4jAspect {
     }
 
     before() : execution (* org.dacapo.harness.Callback+.stop()) {
-	System.out.println("[prm4j.FSM_HasNext] Stopping and resetting... Reported "
-		+ fsm.matchCounter.getCounter().get() + " violations.");
-	fsm.matchCounter.getCounter().set(0);
+	System.out.println("[prm4j.FSM_HasNext] Stopping and resetting...");
 	pm.reset();
 	System.gc();
 	System.gc();

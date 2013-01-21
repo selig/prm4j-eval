@@ -14,6 +14,7 @@ import java.util.Collection;
 import java.util.Iterator;
 
 import org.aspectj.lang.annotation.SuppressAjWarnings;
+import org.dacapo.harness.Callback;
 
 import prm4j.api.Alphabet;
 import prm4j.api.MatchHandler;
@@ -22,12 +23,9 @@ import prm4j.api.ParametricMonitor;
 import prm4j.api.ParametricMonitorFactory;
 import prm4j.api.Symbol1;
 import prm4j.api.Symbol2;
-import prm4j.api.MatchHandler.MatchCounter;
 import prm4j.api.fsm.FSM;
 import prm4j.api.fsm.FSMSpec;
 import prm4j.api.fsm.FSMState;
-
-import org.dacapo.harness.Callback;
 
 /**
  * Standalone version (= with integrated fsm) of the UnsafeIterator pattern.
@@ -49,7 +47,7 @@ public aspect UnsafeIterator extends Prm4jAspect {
     private final Symbol1<Iterator> useIter = alphabet.createSymbol1("useIter", i);
 
     // match handler
-    private final MatchCounter matchCounter = MatchHandler.MATCH_COUNTER;
+    public final  MatchHandler matchHandler = MatchHandler.SYS_OUT;
     
     final FSM fsm = new FSM(alphabet);
 
@@ -61,7 +59,7 @@ public aspect UnsafeIterator extends Prm4jAspect {
 	final FSMState initial = fsm.createInitialState();
 	final FSMState s1 = fsm.createState();
 	final FSMState s2 = fsm.createState();
-	final FSMState error = fsm.createAcceptingState(matchCounter);
+	final FSMState error = fsm.createAcceptingState(matchHandler);
 
 	// fsm transitions
 	initial.addTransition(updateColl, initial);
@@ -95,7 +93,6 @@ public aspect UnsafeIterator extends Prm4jAspect {
 
     before() : execution (* Callback+.stop()) {
 	System.out.println("[prm4j.UnsafeIterator] Stopping and resetting...");
-	matchCounter.getCounter().set(0);
 	pm.reset();
 	System.gc();
 	System.gc();

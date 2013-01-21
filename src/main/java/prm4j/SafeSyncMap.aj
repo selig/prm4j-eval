@@ -31,7 +31,7 @@ public aspect SafeSyncMap extends Prm4jAspect {
     public SafeSyncMap() {
 	fsm = new FSM_UnsafeMapIterator();
 	pm = ParametricMonitorFactory.createParametricMonitor(new FSMSpec(fsm.fsm));
-	System.out.println("prm4j: Parametric monitor for 'SafeSyncCollection' created!");
+	System.out.println("prm4j: Parametric monitor for 'SafeSyncMap' created!");
     }
 
     pointcut UnsafeMapIterator_createColl(Map map) : (call(* Map.values()) || call(* Map.keySet())) && target(map) && prm4jPointcut();
@@ -59,8 +59,7 @@ public aspect SafeSyncMap extends Prm4jAspect {
     }
     
     before() : execution (* Callback+.stop()) {
-	System.out.println("[prm4j.SafeSyncCollection] Stopping and resetting...");
-	fsm.matchCounter.getCounter().set(0);
+	System.out.println("[prm4j.SafeSyncMap] Stopping and resetting...");
 	pm.reset();
 	System.gc();
 	System.gc();
