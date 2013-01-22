@@ -14,7 +14,6 @@ import java.util.Collection;
 import java.util.Iterator;
 
 import org.aspectj.lang.annotation.SuppressAjWarnings;
-import org.dacapo.harness.Callback;
 
 import prm4j.api.Alphabet;
 import prm4j.api.MatchHandler;
@@ -87,11 +86,11 @@ public aspect SafeIterator extends Prm4jAspect {
 	pm.processEvent(useIter.createEvent(i));
     }
 
-    before() : execution (* Callback+.start(String)) {
+    before() : execution (* org.dacapo.harness.Callback+.start(String)) {
 	System.out.println("[prm4j.SafeIterator] Starting...");
     }
 
-    before() : execution (* Callback+.stop()) {
+    after() : execution (* org.dacapo.harness.Callback+.stop()) {
 	System.out.println("[prm4j.SafeIterator] Stopping and resetting...");
 	pm.reset();
 	System.gc();

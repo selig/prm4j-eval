@@ -44,7 +44,7 @@ public aspect HasNext extends Prm4jAspect {
 	pm.processEvent(fsm.next.createEvent(i));
     }
 
-    before() : execution (* org.dacapo.harness.Callback+.stop()) {
+    after() : execution (* org.dacapo.harness.Callback+.stop()) {
 	System.out.println("[prm4j.HasNext] Stopping and resetting...");
 	pm.reset();
 	System.gc();

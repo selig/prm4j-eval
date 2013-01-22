@@ -79,7 +79,7 @@ public aspect HasNext_SafeIterator extends Prm4jAspect {
 	System.out.println("[prm4j.HasNext+SafeIterator] Starting...");
     }
 
-    before() : execution (* org.dacapo.harness.Callback+.stop()) {
+    after() : execution (* org.dacapo.harness.Callback+.stop()) {
 	System.out.println("[prm4j.HasNext+SafeIterator] Stopping and resetting...");
 	pm1.reset();
 	pm2.reset();

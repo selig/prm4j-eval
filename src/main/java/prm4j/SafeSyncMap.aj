@@ -72,7 +72,7 @@ public aspect SafeSyncMap extends Prm4jAspect {
 	pm.processEvent(fsm.accessIter.createConditionalEvent(i, threadHoldsNoLockOnCollection));
     }
 
-    before() : execution (* Callback+.stop()) {
+    after() : execution (* Callback+.stop()) {
 	System.out.println("[prm4j.SafeSyncMap] Stopping and resetting...");
 	pm.reset();
 	System.gc();

@@ -57,7 +57,7 @@ public aspect SafeMapIterator extends Prm4jAspect {
 	pm.processEvent(fsm.updateMap.createEvent(map));
     }
     
-    before() : execution (* org.dacapo.harness.Callback+.stop()) {
+    after() : execution (* org.dacapo.harness.Callback+.stop()) {
   	System.out.println("[prm4j.SafeMapIterator] Stopping and resetting...");
 	pm.reset();
 	System.gc();
