@@ -5,6 +5,8 @@
 	</aspects>
 	<weaver>
 		<include>org.dacapo.harness.Callback</include>
+		<exclude within="org.aspectj..*" />
+		<exclude within="prm4j..*" />
 		<exclude within="prm4jeval..*" />
 		<exclude within="org.apache.commons..*" />
 		<exclude within="com.google..*" />
