@@ -24,31 +24,31 @@ import prm4j.api.fsm.FSMState;
 @SuppressWarnings("rawtypes")
 public class FSM_SafeIterator {
 
-	public final Alphabet alphabet = new Alphabet();
+    public final Alphabet alphabet = new Alphabet();
 
-	public final Parameter<Collection> c = alphabet.createParameter("c", Collection.class);
-	public final Parameter<Iterator> i = alphabet.createParameter("i", Iterator.class);
+    public final Parameter<Collection> c = alphabet.createParameter("c", Collection.class);
+    public final Parameter<Iterator> i = alphabet.createParameter("i", Iterator.class);
 
-	public final Symbol2<Collection, Iterator> createIter = alphabet.createSymbol2("createIter", c, i);
-	public final Symbol1<Collection> updateColl = alphabet.createSymbol1("updateColl", c);
-	public final Symbol1<Iterator> useIter = alphabet.createSymbol1("useIter", i);
+    public final Symbol2<Collection, Iterator> createIter = alphabet.createSymbol2("createIter", c, i);
+    public final Symbol1<Collection> updateColl = alphabet.createSymbol1("updateColl", c);
+    public final Symbol1<Iterator> useIter = alphabet.createSymbol1("useIter", i);
 
-	public final FSM fsm = new FSM(alphabet);
+    public final FSM fsm = new FSM(alphabet);
 
-	public final  MatchHandler matchHandler = MatchHandler.SYS_OUT;
+    public final MatchHandler matchHandler = MatchHandler.SYS_OUT;
 
-	public final FSMState initial = fsm.createInitialState();
-	public final FSMState s1 = fsm.createState();
-	public final FSMState s2 = fsm.createState();
-	public final FSMState s3 = fsm.createState();
-	public final FSMState error = fsm.createAcceptingState(matchHandler);
+    public final FSMState initial = fsm.createInitialState();
+    public final FSMState s1 = fsm.createState();
+    public final FSMState s2 = fsm.createState();
+    public final FSMState s3 = fsm.createState();
+    public final FSMState error = fsm.createAcceptingState(matchHandler);
 
-	public FSM_SafeIterator() {
-	    initial.addTransition(createIter, s1);
-	    initial.addTransition(updateColl, initial);
-	    s1.addTransition(useIter, s1);
-	    s1.addTransition(updateColl, s2);
-	    s2.addTransition(updateColl, s2);
-	    s2.addTransition(useIter, error);
-	}
+    public FSM_SafeIterator() {
+	initial.addTransition(updateColl, initial);
+	initial.addTransition(createIter, s1);
+	s1.addTransition(useIter, s1);
+	s1.addTransition(updateColl, s2);
+	s2.addTransition(updateColl, s2);
+	s2.addTransition(useIter, error);
+    }
 }
