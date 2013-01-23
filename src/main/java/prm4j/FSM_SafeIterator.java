@@ -35,7 +35,7 @@ public class FSM_SafeIterator {
 
     public final FSM fsm = new FSM(alphabet);
 
-    public final MatchHandler matchHandler = MatchHandler.SYS_OUT;
+    public final MatchHandler matchHandler = MatchHandler.NO_OP;
 
     public final FSMState initial = fsm.createInitialState();
     public final FSMState s1 = fsm.createState();

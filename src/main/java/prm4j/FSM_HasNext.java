@@ -31,7 +31,7 @@ public class FSM_HasNext {
 
 	public final FSM fsm = new FSM(alphabet);
 
-	public final  MatchHandler matchHandler = MatchHandler.SYS_OUT;
+	public final  MatchHandler matchHandler = MatchHandler.NO_OP;
 
 	public final FSMState initial = fsm.createInitialState();
 	public final FSMState safe = fsm.createState();
