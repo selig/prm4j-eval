@@ -87,14 +87,16 @@ public class MemoryLogger {
     }
 
     /**
-     * Writes memory consumption (mean and max) and number of counted events to disk.
+     * Writes memory consumption (mean and max), number of counted events and number of violations to disk.
+     * => it benchm paramPropert iter mean-MB___ max-MB____ #events #viola
+     * => 00 avrora SafeIterator iter 126.242460 205.088867 1367408 103521
      */
-    public void writeToFile() {
+    public void writeToFile(int violationsCount) {
 	if (MEMORY_LOGGING) {
 	    logger.log(
 		    Level.INFO,
-		    String.format("%02d %s %s iter %f %f %d", invocation, benchmark, parametricProperty,
-			    memStats.getMean(), memStats.getMax(), timestamp));
+		    String.format("%02d %s %s iter %f %f %d %d", invocation, benchmark, parametricProperty,
+			    memStats.getMean(), memStats.getMax(), timestamp, violationsCount));
 
 	    System.out.println("Counted " + timestamp + " events.");
 

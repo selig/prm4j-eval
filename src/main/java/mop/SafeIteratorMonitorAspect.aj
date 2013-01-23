@@ -514,8 +514,6 @@ public aspect SafeIteratorMonitorAspect implements javamoprt.MOPObject {
 
 		memoryLogger.reallyLogMemoryConsumption(); // so we have at least two values
 		
-		SafeIteratorMonitor.MATCHES.set(0); // reset counter
-		
 		SafeIterator_timestamp = 1;
 
 		SafeIterator_activated = false;
@@ -538,7 +536,9 @@ public aspect SafeIteratorMonitorAspect implements javamoprt.MOPObject {
 		SafeIteratorMapManager = new javamoprt.map.MOPMapManager();
 		SafeIteratorMapManager.start();
 		
-		memoryLogger.writeToFile();
+		memoryLogger.writeToFile(HasNextMonitor.MATCHES.get());
+		
+		HasNextMonitor.MATCHES.set(0); // reset counter
 		
 		System.gc();
 		System.gc();

@@ -350,8 +350,6 @@ public aspect HasNextMonitorAspect implements javamoprt.MOPObject {
 		
 		memoryLogger.reallyLogMemoryConsumption(); // so we have at least two values
 		
-		HasNextMonitor.MATCHES.set(0); // reset counter
-		
 		HasNext_activated = false;
 
 		HasNext_i_Map = new javamoprt.map.MOPBasicRefMapOfMonitor(0);
@@ -363,7 +361,9 @@ public aspect HasNextMonitorAspect implements javamoprt.MOPObject {
 		HasNextMapManager = new javamoprt.map.MOPMapManager();
 		HasNextMapManager.start();
 		
-		memoryLogger.writeToFile();
+		memoryLogger.writeToFile(HasNextMonitor.MATCHES.get());
+		
+		HasNextMonitor.MATCHES.set(0); // reset counter
 		
 		System.gc();
 		System.gc();

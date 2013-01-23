@@ -657,8 +657,6 @@ public aspect SafeSyncCollectionMonitorAspect implements javamoprt.MOPObject {
 		
 		memoryLogger.reallyLogMemoryConsumption(); // so we have at least two values
 		
-		SafeSyncCollectionMonitor.MATCHES.set(0); // reset counter
-		
 		SafeSyncCollection_timestamp = 1;
 
 		SafeSyncCollection_activated = false;
@@ -681,7 +679,9 @@ public aspect SafeSyncCollectionMonitorAspect implements javamoprt.MOPObject {
 		SafeSyncCollectionMapManager = new javamoprt.map.MOPMapManager();
 		SafeSyncCollectionMapManager.start();
 		
-		memoryLogger.writeToFile();
+		memoryLogger.writeToFile(HasNextMonitor.MATCHES.get());
+		
+		HasNextMonitor.MATCHES.set(0); // reset counter
 		
 		System.gc();
 		System.gc();

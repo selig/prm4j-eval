@@ -952,8 +952,6 @@ public aspect SafeSyncMapMonitorAspect implements javamoprt.MOPObject {
 
 		memoryLogger.reallyLogMemoryConsumption(); // so we have at least two values
 		
-		SafeSyncMapMonitor.MATCHES.set(0); // reset counter
-		
 		SafeSyncMap_timestamp = 1;
 
 		SafeSyncMap_activated = false;
@@ -988,7 +986,9 @@ public aspect SafeSyncMapMonitorAspect implements javamoprt.MOPObject {
 		SafeSyncMapMapManager = new javamoprt.map.MOPMapManager();
 		SafeSyncMapMapManager.start();
 		
-		memoryLogger.writeToFile();
+		memoryLogger.writeToFile(HasNextMonitor.MATCHES.get());
+		
+		HasNextMonitor.MATCHES.set(0); // reset counter
 		
 		System.gc();
 		System.gc();
