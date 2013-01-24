@@ -40,12 +40,12 @@ echo "Compiling aspect..."
 java -jar $AJC -cp ${RT}:${JAVAMOPRT}:$DACAPO:$GUAVA:$APACHEMATH src/main/java/mop/* -d target/classes -6
 
 # create jar with callback
-javac src/main/java/prm4jeval/* -d target/classes -cp $DACAPO:$APACHEMATH:$GUAVA
+javac src/main/java/prm4jeval/*.java -d target/classes -cp $DACAPO:$APACHEMATH:$GUAVA
 jar cf target/jars/Callback.jar -C target/classes .
 
 # load-time weaving via aspectjweaver, run 16 invocations with up to 25 iterations
 for invocation in {0..15}; do
-	for paramProperty in HasNext UnsafeIterator UnsafeMapIterator SafeSyncCollection SafeSyncMap ; do
+	for paramProperty in HasNext SafeSyncMap ; do
 		
 		# create custom aop-ajc.xml and put in META-INF
 		sed 's/<aspectname>/mop.'$paramProperty'MonitorAspect/g' src/main/resources/mop/aop-ajc.xml > target/classes/META-INF/aop-ajc.xml
@@ -57,16 +57,15 @@ for invocation in {0..15}; do
 		rm target/classes/META-INF/aop-ajc.xml
 		
 		# lusearch is removed because it keeps on crashing randomly
-		for benchmark in avrora batik eclipse fop h2 jython luindex \
+		for benchmark in avrora \
 			pmd sunflow tomcat tradebeans tradesoap xalan ; do
 		STATUS=0
 			while [ $STATUS -eq 0 ]; do
     			echo "Starting benchmark [javamop:$benchmark:$paramProperty] invocation $invocation..."
 				java -Xms256M -Xmx2048M -javaagent:${WEAVER} -Xbootclasspath/a:$RT \
-					-Dprm4jeval.invocation=$invocation \
-					-Dprm4jeval.outputfile=results/javamop.log \
+					-Dprm4jeval.outputfile=logs/javamop.log \
 					-Dprm4jeval.memoryLogging=true \
-					-Dprm4jeval.benchmark=$benchmark -Dprm4jeval.parametricProperty=$paramProperty \
+					-Dprm4jeval.experimentName="${invocation} ${benchmark} ${paramProperty}" \
 					-cp $DACAPO:$GUAVA:$JAVAMOPRT:$APACHEMATH:${DIR}/target/jars/mop/$paramProperty.jar:${DIR}/target/jars/Callback.jar \
 					Harness --no-validation -c prm4jeval.EvalCallback $benchmark
 				STATUS=$?

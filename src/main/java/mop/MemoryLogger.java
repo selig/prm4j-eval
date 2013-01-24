@@ -19,6 +19,8 @@ import java.util.logging.Logger;
 
 import org.apache.commons.math3.stat.descriptive.SummaryStatistics;
 
+import prm4j.api.MatchHandler;
+
 /**
  * Logs memory consumption to file. Activated by system property "prm4jeval.memoryLogging".
  */
@@ -32,9 +34,7 @@ public class MemoryLogger {
 
     private Logger logger;
 
-    private String benchmark;
-    private String parametricProperty;
-    private int invocation;
+    private String experimentName;
 
     // Trying to track down NaNs which appeared in mean and max.
     private int NaNcount = 0;
@@ -44,9 +44,7 @@ public class MemoryLogger {
 	    memStats = new SummaryStatistics();
 	    String outputPath = getMandatorySystemProperty("prm4jeval.outputfile") + ".mem.log";
 	    System.out.println("Memory logging activated. Output path: " + outputPath);
-	    benchmark = getMandatorySystemProperty("prm4jeval.benchmark");
-	    parametricProperty = getMandatorySystemProperty("prm4jeval.parametricProperty");
-	    invocation = Integer.parseInt(getMandatorySystemProperty("prm4jeval.invocation"));
+	    experimentName = getSystemProperty("prm4j.experimentName", "");
 	    logger = getFileLogger(outputPath);
 	} else {
 	    System.out.println("Memory logging not activated.");
@@ -88,25 +86,20 @@ public class MemoryLogger {
 
     /**
      * Writes memory consumption (mean and max), number of counted events and number of violations to disk.
-     * => it benchm paramPropert iter mean-MB___ max-MB____ #events #viola
-     * => 00 avrora SafeIterator iter 126.242460 205.088867 1367408 103521
      */
     public void writeToFile(int violationsCount) {
 	if (MEMORY_LOGGING) {
-	    logger.log(
-		    Level.INFO,
-		    String.format("%02d %s %s iter %f %f %d %d", invocation, benchmark, parametricProperty,
-			    memStats.getMean(), memStats.getMax(), timestamp, violationsCount));
+	    logger.log(Level.INFO, String.format("%s EVENTS (totalCount) %d", experimentName, timestamp));
+	    logger.log(Level.INFO,
+		    String.format("%s MATCHES (totalCount) %d", experimentName, MatchHandler.getMatchCount()));
+	    logger.log(Level.INFO,
+		    String.format("%s MEMORY (mean/max) %f %f", experimentName, memStats.getMean(), memStats.getMax()));
+	    logger.log(Level.INFO, String.format("%s NaN (totalCount) %d", experimentName, NaNcount));
 
-	    System.out.println("Counted " + timestamp + " events.");
-
-	    // Trying to track down NaNs which appeared in mean and max.
-	    if (NaNcount > 0) {
-		System.out.println("Counted " + NaNcount + " NaN-measurements of memory consumption.");
-	    }
 	    // reset
 	    memStats.clear();
 	    timestamp = 0L;
+	    NaNcount = 0;
 	}
     }
 
