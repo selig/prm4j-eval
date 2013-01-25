@@ -17,7 +17,7 @@ public class EvalCallback extends Callback {
     private final Logger logger;
 
     private final String benchmark;
-    private final String parametricProperty;
+    private final String paramProperty;
     private final int invocation;
 
     private int iterationCount = 0;
@@ -28,7 +28,7 @@ public class EvalCallback extends Callback {
 	super(args);
 	logger = getFileLogger(getMandatorySystemProperty("prm4jeval.outputfile"));
 	benchmark = getMandatorySystemProperty("prm4jeval.benchmark");
-	parametricProperty = getMandatorySystemProperty("prm4jeval.parametricProperty");
+	paramProperty = getMandatorySystemProperty("prm4jeval.paramProperty");
 	invocation = Integer.parseInt(getMandatorySystemProperty("prm4jeval.invocation"));
     }
 
@@ -81,7 +81,7 @@ public class EvalCallback extends Callback {
     public void stop() {
 	long elapsedTime = System.currentTimeMillis() - startTime;
 	ssi.addMeasurement(elapsedTime);
-	logger.log(Level.INFO, String.format("%02d %s %s iter %02d %d %f", invocation, benchmark, parametricProperty,
+	logger.log(Level.INFO, String.format("%02d %s %s iter %02d %d %f", invocation, benchmark, paramProperty,
 		iterationCount, elapsedTime, ssi.getCoefficientOfStandardDeviation()));
 	System.out.println("[DaCapo] Stopping... time: " + elapsedTime);
 	System.gc();
@@ -93,7 +93,7 @@ public class EvalCallback extends Callback {
     public boolean runAgain() {
 	if (ssi.isThresholdReached()) {
 	    logger.log(Level.INFO, String.format("%02d %s %s mean %02d %f %f", invocation, benchmark,
-		    parametricProperty, iterationCount, ssi.getMean(), ssi.getCoefficientOfStandardDeviation()));
+		    paramProperty, iterationCount, ssi.getMean(), ssi.getCoefficientOfStandardDeviation()));
 	    System.exit(1);
 	}
 	return true;
