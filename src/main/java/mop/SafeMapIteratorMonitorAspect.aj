@@ -827,9 +827,9 @@ public aspect SafeMapIteratorMonitorAspect implements javamoprt.MOPObject {
 		SafeMapIteratorMapManager = new javamoprt.map.MOPMapManager();
 		SafeMapIteratorMapManager.start();
 		
-		memoryLogger.writeToFile(HasNextMonitor.MATCHES.get());
+		memoryLogger.writeToFile(SafeMapIteratorMonitor.MATCHES.get());
 		
-		HasNextMonitor.MATCHES.set(0); // reset counter
+		SafeMapIteratorMonitor.MATCHES.set(0); // reset counter
 		
 		System.gc();
 		System.gc();

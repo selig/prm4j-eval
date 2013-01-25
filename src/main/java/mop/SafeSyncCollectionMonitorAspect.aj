@@ -679,9 +679,9 @@ public aspect SafeSyncCollectionMonitorAspect implements javamoprt.MOPObject {
 		SafeSyncCollectionMapManager = new javamoprt.map.MOPMapManager();
 		SafeSyncCollectionMapManager.start();
 		
-		memoryLogger.writeToFile(HasNextMonitor.MATCHES.get());
+		memoryLogger.writeToFile(SafeSyncCollectionMonitor.MATCHES.get());
 		
-		HasNextMonitor.MATCHES.set(0); // reset counter
+		SafeSyncCollectionMonitor.MATCHES.set(0); // reset counter
 		
 		System.gc();
 		System.gc();
