@@ -19,8 +19,6 @@ import java.util.logging.Logger;
 
 import org.apache.commons.math3.stat.descriptive.SummaryStatistics;
 
-import prm4j.api.MatchHandler;
-
 /**
  * Logs memory consumption to file. Activated by system property "prm4jeval.memoryLogging".
  */
@@ -44,7 +42,9 @@ public class MemoryLogger {
 	    memStats = new SummaryStatistics();
 	    String outputPath = getMandatorySystemProperty("prm4jeval.outputfile") + ".mem.log";
 	    System.out.println("Memory logging activated. Output path: " + outputPath);
-	    experimentName = getSystemProperty("prm4j.experimentName", "");
+	    experimentName = getMandatorySystemProperty("prm4jeval.invocation") + " "
+		    + getMandatorySystemProperty("prm4jeval.benchmark") + " "
+		    + getMandatorySystemProperty("prm4jeval.paramProperty");
 	    logger = getFileLogger(outputPath);
 	} else {
 	    System.out.println("Memory logging not activated.");
@@ -87,14 +87,15 @@ public class MemoryLogger {
     /**
      * Writes memory consumption (mean and max), number of counted events and number of violations to disk.
      */
-    public void writeToFile(int violationsCount) {
+    public void writeToFile(int matchCount) {
 	if (MEMORY_LOGGING) {
 	    logger.log(Level.INFO, String.format("%s EVENTS (totalCount) %d", experimentName, timestamp));
-	    logger.log(Level.INFO,
-		    String.format("%s MATCHES (totalCount) %d", experimentName, MatchHandler.getMatchCount()));
+	    logger.log(Level.INFO, String.format("%s MATCHES (totalCount) %d", experimentName, matchCount));
 	    logger.log(Level.INFO,
 		    String.format("%s MEMORY (mean/max) %f %f", experimentName, memStats.getMean(), memStats.getMax()));
-	    logger.log(Level.INFO, String.format("%s NaN (totalCount) %d", experimentName, NaNcount));
+	    if (NaNcount > 0) {
+		logger.log(Level.INFO, String.format("%s NaN (totalCount) %d", experimentName, NaNcount));
+	    }
 
 	    // reset
 	    memStats.clear();
