@@ -64,7 +64,7 @@ for invocation in {0..15}; do
 					-Dprm4j.monitorCleaningInterval=500 \
 					-Dprm4j.experimentName="${invocation} ${benchmark} ${paramProperty}" \
 					-Dprm4jeval.outputfile=logs/prm4j.log \
-					-Dprm4jeval.benchmark=${benchmark} -Dprm4jeval.parametricProperty=${paramProperty} \
+					-Dprm4jeval.benchmark=${benchmark} -Dprm4jeval.paramProperty=${paramProperty} \
 					-cp $DACAPO:$GUAVA:$PRM4J:$APACHEMATH:${DIR}/target/jars/prm4j/${paramProperty}.jar:${DIR}/target/jars/Callback.jar \
 					Harness --no-validation -c prm4jeval.EvalCallback $benchmark
 				STATUS=$?
