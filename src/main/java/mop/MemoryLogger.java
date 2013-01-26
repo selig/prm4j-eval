@@ -24,7 +24,7 @@ import org.apache.commons.math3.stat.descriptive.SummaryStatistics;
  */
 public class MemoryLogger {
 
-    private final static boolean MEMORY_LOGGING = Boolean.parseBoolean(getSystemProperty("prm4jeval.memoryLogging",
+    private final static boolean STATS_LOGGING = Boolean.parseBoolean(getSystemProperty("prm4jeval.statsLogging",
 	    "false"));
 
     private SummaryStatistics memStats;
@@ -38,10 +38,10 @@ public class MemoryLogger {
     private int NaNcount = 0;
 
     MemoryLogger() {
-	if (MEMORY_LOGGING) {
+	if (STATS_LOGGING) {
 	    memStats = new SummaryStatistics();
-	    String outputPath = getMandatorySystemProperty("prm4jeval.outputfile") + ".mem.log";
-	    System.out.println("Memory logging activated. Output path: " + outputPath);
+	    String outputPath = "logs/javamop-stats.log";
+	    System.out.println("Logging activated. Output path: " + outputPath);
 	    experimentName = getMandatorySystemProperty("prm4jeval.invocation") + " "
 		    + getMandatorySystemProperty("prm4jeval.benchmark") + " "
 		    + getMandatorySystemProperty("prm4jeval.paramProperty");
@@ -55,7 +55,7 @@ public class MemoryLogger {
      * Registers the memory consumption every 100 events. Flag MEMORY_LOGGING has to be activated.
      */
     public void logMemoryConsumption() {
-	if (MEMORY_LOGGING && timestamp++ % 100 == 0) {
+	if (STATS_LOGGING && timestamp++ % 100 == 0) {
 	    double memoryConsumption = (((double) (Runtime.getRuntime().totalMemory() / 1024) / 1024) - ((double) (Runtime
 		    .getRuntime().freeMemory() / 1024) / 1024));
 	    // filter NaNs
@@ -72,7 +72,7 @@ public class MemoryLogger {
      * to be activated.
      */
     public void reallyLogMemoryConsumption() {
-	if (MEMORY_LOGGING) {
+	if (STATS_LOGGING) {
 	    double memoryConsumption = (((double) (Runtime.getRuntime().totalMemory() / 1024) / 1024) - ((double) (Runtime
 		    .getRuntime().freeMemory() / 1024) / 1024));
 	    // filter NaNs
@@ -88,7 +88,7 @@ public class MemoryLogger {
      * Writes memory consumption (mean and max), number of counted events and number of violations to disk.
      */
     public void writeToFile(int matchCount) {
-	if (MEMORY_LOGGING) {
+	if (STATS_LOGGING) {
 	    logger.log(Level.INFO, String.format("%s EVENTS (totalCount) %d", experimentName, timestamp));
 	    logger.log(Level.INFO, String.format("%s MATCHES (totalCount) %d", experimentName, matchCount));
 	    logger.log(Level.INFO,
