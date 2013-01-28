@@ -45,7 +45,7 @@ jar cf target/jars/Callback.jar -C target/classes .
 
 # load-time weaving via aspectjweaver, run 16 invocations with up to 25 iterations
 for invocation in {0..15}; do
-	for paramProperty in HasNext SafeSyncMap ; do
+	for paramProperty in HasNext SafeIterator SafeMapIterator SafeSyncCollection SafeSyncMap ; do
 		
 		# create custom aop-ajc.xml and put in META-INF
 		sed 's/<aspectname>/mop.'$paramProperty'MonitorAspect/g' src/main/resources/mop/aop-ajc.xml > target/classes/META-INF/aop-ajc.xml
@@ -57,8 +57,8 @@ for invocation in {0..15}; do
 		rm target/classes/META-INF/aop-ajc.xml
 		
 		# lusearch is removed because it keeps on crashing randomly
-		for benchmark in avrora \
-			pmd sunflow tomcat tradebeans tradesoap xalan ; do
+		for benchmark in avrora batik eclipse fop h2 jython luindex \
+					pmd sunflow tomcat tradebeans tradesoap xalan ; do
 		STATUS=0
 			while [ $STATUS -eq 0 ]; do
     			echo "Starting benchmark [javamop:$benchmark:$paramProperty] invocation $invocation..."
