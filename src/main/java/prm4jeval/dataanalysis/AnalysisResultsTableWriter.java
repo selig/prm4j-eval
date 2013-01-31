@@ -24,7 +24,7 @@ import org.apache.commons.io.FilenameUtils;
 
 import com.google.common.collect.Multimap;
 
-public class CITableWriter {
+public class AnalysisResultsTableWriter {
 
     private final static double confidenceLevel = 0.99D;
 

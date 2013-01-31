@@ -93,11 +93,11 @@ public class Analysis {
     }
 
     private static void writeBaselinePerformanceTable(String baselineLogName, String outputPath) {
-	CITableWriter.writeCITable(getRuntimeParser(baselineLogName), outputPath, "");
+	AnalysisResultsTableWriter.writeCITable(getRuntimeParser(baselineLogName), outputPath, "");
     }
 
     private static void writeNormalizedSummedPerformanceTable(String logName, String baseline, String outputPath) {
-	CITableWriter.writeSumTable( //
+	AnalysisResultsTableWriter.writeSumTable( //
 		new TableParser1(logName) {
 
 		    @Override
@@ -110,7 +110,7 @@ public class Analysis {
 
 		}, outputPath, "summed");
 
-	CITableWriter.writeSumTable( //
+	AnalysisResultsTableWriter.writeSumTable( //
 		new TableParser1(baseline) {
 
 		    @Override
@@ -135,7 +135,7 @@ public class Analysis {
     private static void writeStatsTable(final String logName, final String outputPath, final String tableName,
 	    final String rowFilter, final int columnNr) {
 	final Set<String> skippedFirstLines = new HashSet<String>();
-	CITableWriter.writeCITable( //
+	AnalysisResultsTableWriter.writeCITable( //
 		new TableParser2(logName) {
 		    @Override
 		    public void parseLine(String line) {
@@ -152,7 +152,7 @@ public class Analysis {
 
     private static void writeNormalizedPerformanceTable(final String logName, final String baselinePath,
 	    final String outputPath) {
-	CITableWriter.writeCITable( //
+	AnalysisResultsTableWriter.writeCITable( //
 		new TableParser2(logName) {
 		    @Override
 		    public void parseLine(String line) {
