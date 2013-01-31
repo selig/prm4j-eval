@@ -1,0 +1,84 @@
+#!/usr/bin/env bash
+
+# Compiles and runs prm4j aspects with the DaCapo-9.12-bach benchmark using aspectj load-time weaving.
+
+# usage:         ./prm4j
+
+# list of all benchmarks can be found at http://dacapobench.org/benchmarks.html 
+
+# remember directory where this script is called (some benchmarks need absolute paths)
+DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
+
+# try to install project from source
+if [ -d ../prm4j ]; then
+    echo "Installing current version of prm4j..."
+	cd ../prm4j
+	mvn install assembly:single -Dmaven.test.skip=true
+	cd "${DIR}"
+fi
+
+echo "Resolving maven dependencies... (may take a while)"
+mvn dependency:resolve --update-snapshots
+
+# get and process classpath from maven pom
+mvn -q dependency:build-classpath -Dmdep.outputFile=dependency-outputfile
+tr ':' '\n' < dependency-outputfile > dependency-list
+
+# get classpaths to local maven repo
+AJC=$(grep "aspectjtools" dependency-list)
+RT=$(grep "aspectjrt" dependency-list)
+WEAVER=$(grep "aspectjweaver" dependency-list)
+PRM4J=$(grep "prm4j" dependency-list)
+GUAVA=$(grep "guava" dependency-list)
+APACHEMATH=$(grep "math3" dependency-list)
+DACAPO=$(grep "dacapo" dependency-list)
+
+# cleanup tempfiles
+rm dependency-outputfile dependency-list
+
+# create working and target directories
+mkdir -p target/classes/META-INF target/jars/prm4j
+
+# compile the aspect into classes
+echo "Compiling aspect..."
+java -jar $AJC -cp $GUAVA:$PRM4J:$RT:$DACAPO:$APACHEMATH src/main/java/prm4j/* -d target/classes -6
+
+# create jar with callback
+javac src/main/java/prm4jeval/*.java -d target/classes -cp $DACAPO:$APACHEMATH:$GUAVA
+jar cf target/jars/Callback.jar -C target/classes .
+
+# load-time weaving via aspectjweaver
+for invocation in {0..3}; do
+	for paramProperty in HasNext SafeIterator SafeMapIterator ; do
+	
+	   # create custom aop-ajc.xml and put in META-INF
+	   sed 's/<aspectname>/prm4j.'$paramProperty'/g' src/main/resources/prm4j/aop-ajc.xml > target/classes/META-INF/aop-ajc.xml
+	   
+	   # repackage each aspect into a single jars with the custom aop-ajc.xml
+	   jar cf target/jars/prm4j/${paramProperty}.jar -C target/classes META-INF/aop-ajc.xml -C target/classes prm4j/${paramProperty}.class -C target/classes prm4j/FSM_${paramProperty}.class
+	   
+	   # cleanup custom aop-ajc.xml
+	   rm target/classes/META-INF/aop-ajc.xml
+	   	
+		for benchmark in avrora batik fop jython pmd tradebeans ; do
+			for bindingCleaningInterval in 1024 ; do
+			STATUS=0
+				while [ $STATUS -eq 0 ]; do
+	    			echo "Starting benchmark [prm4j:$benchmark:$paramProperty] measurement $invocation..."
+					java -Xmx2048M -javaagent:${WEAVER} -Xbootclasspath/a:$RT \
+						-Dprm4jeval.invocation=$invocation \
+						-Dprm4j.debug=true \
+						-Dprm4j.bindingCleaningInterval=$bindingCleaningInterval \
+						-Dprm4j.monitorCleaningInterval=500 \
+						-Dprm4j.experimentName="${invocation} ${benchmark} ${paramProperty}" \
+						-Dprm4j.outputfile=logs/variants/"bCI=$bindingCleaningInterval"/prm4j-stats.log \
+						-Dprm4jeval.outputfile=logs/variants/"bCI=$bindingCleaningInterval"/prm4j.log \
+						-Dprm4jeval.benchmark=${benchmark} -Dprm4jeval.paramProperty=${paramProperty} \
+						-cp $DACAPO:$GUAVA:$PRM4J:$APACHEMATH:${DIR}/target/jars/prm4j/${paramProperty}.jar:${DIR}/target/jars/Callback.jar \
+						Harness --no-validation -c prm4jeval.EvalCallback $benchmark
+					STATUS=$?
+				done
+			done
+		done
+	done
+done
