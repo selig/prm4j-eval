@@ -1,5 +1,6 @@
 package prm4jeval;
 
+import java.io.File;
 import java.util.logging.FileHandler;
 import java.util.logging.Formatter;
 import java.util.logging.Handler;
@@ -34,12 +35,13 @@ public class EvalCallback extends Callback {
 
     /**
      * A simple file logger which outputs only the message.
-     *
+     * 
      * @param fileName
      *            path to the output file
      * @return the logger
      */
     private static Logger getFileLogger(String fileName) {
+	new File(fileName).getParentFile().mkdirs();
 	final Logger logger = Logger.getLogger(fileName);
 	try {
 	    logger.setUseParentHandlers(false);
@@ -92,8 +94,8 @@ public class EvalCallback extends Callback {
     @Override
     public boolean runAgain() {
 	if (ssi.isThresholdReached()) {
-	    logger.log(Level.INFO, String.format("%02d %s %s mean %02d %f %f", invocation, benchmark,
-		    paramProperty, iterationCount, ssi.getMean(), ssi.getCoefficientOfStandardDeviation()));
+	    logger.log(Level.INFO, String.format("%02d %s %s mean %02d %f %f", invocation, benchmark, paramProperty,
+		    iterationCount, ssi.getMean(), ssi.getCoefficientOfStandardDeviation()));
 	    System.exit(1);
 	}
 	return true;
