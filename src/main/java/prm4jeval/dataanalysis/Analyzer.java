@@ -14,6 +14,7 @@ import static org.apache.commons.io.FilenameUtils.concat;
 
 import java.io.File;
 import java.util.HashSet;
+import java.util.Locale;
 import java.util.Set;
 
 import org.apache.commons.io.FilenameUtils;
@@ -22,6 +23,8 @@ import org.apache.commons.io.FilenameUtils;
  * Perform analysis based on log files.
  */
 public class Analyzer {
+
+    private final static String TABLE_FORMAT = "%-16s  %16s  %16s\n";
 
     /**
      * Run to perform the analysis and write analysis results into the output location(s).
@@ -46,18 +49,6 @@ public class Analyzer {
 	new File(finalOutputPath).mkdirs();
 	new File(variantsOutputPath).mkdirs();
 
-	for (File variant : new File(variantsInputPath).listFiles()) {
-	    if (variant.isDirectory()) {
-		final String variantPath = variant.getAbsolutePath();
-		final File variantOutputPath = new File(concat(variantsOutputPath,
-			FilenameUtils.getBaseName(variantPath)));
-		variantOutputPath.mkdir();
-		writeNormalizedSummedPerformanceTable(concat(variantPath, "prm4j.log"),
-			concat(variantsInputPath, "baseline-small.log"), variantOutputPath.getAbsolutePath());
-		writePrm4jStatsTables(concat(variantPath, "prm4j-stats.log"), variantOutputPath.getAbsolutePath());
-	    }
-	}
-
 	// write benchmark means
 	writeBaselinePerformanceTable(concat(finalInputPath, "baseline.log"), finalOutputPath);
 
@@ -69,6 +60,29 @@ public class Analyzer {
 		finalOutputPath);
 	writePrm4jStatsTables(concat(finalInputPath, "prm4j-stats.log"), finalOutputPath);
 
+	// perform an analysis of all implementation variants of prm4j
+	analyzePrm4jVariants(variantsInputPath, variantsOutputPath);
+
+    }
+
+    private static void analyzePrm4jVariants(final String inputPath, final String outputPath) {
+	final StringBuilder sb = new StringBuilder().append(String
+		.format(TABLE_FORMAT, "name", "% of runtime", "error"));
+	for (File variant : new File(inputPath).listFiles()) {
+	    if (variant.isDirectory()) {
+		final String variantPath = variant.getAbsolutePath();
+		final File variantOutputPath = new File(concat(outputPath, FilenameUtils.getBaseName(variantPath)));
+		variantOutputPath.mkdir();
+		writeNormalizedSummedPerformanceTable(concat(variantPath, "prm4j.log"),
+			concat(inputPath, "baseline-small.log"), variantOutputPath.getAbsolutePath());
+		writePrm4jStatsTables(concat(variantPath, "prm4j-stats.log"), variantOutputPath.getAbsolutePath());
+
+		// aggregate all variant results into one file for convenience
+		new VariantParser(variantOutputPath, sb).parseFile();
+	    }
+	}
+	// write aggregated variant results
+	AnalysisResultsTableWriter.writeToFile(sb.toString(), concat(outputPath, "prm4j-variants.log"));
     }
 
     private static void writePrm4jStatsTables(String logName, String outputPath) {
@@ -187,5 +201,27 @@ public class Analyzer {
 		}
 	    }
 	};
+    }
+
+    static class VariantParser extends LineParser {
+
+	final StringBuilder sb;
+	final String experimentName;
+
+	public VariantParser(File file, StringBuilder sb) {
+	    super(FilenameUtils.concat(file.getAbsolutePath(), "prm4j-summed-all-normalized.log"));
+	    experimentName = FilenameUtils.getBaseName(file.getAbsolutePath());
+	    this.sb = sb;
+
+	}
+
+	@Override
+	public void parseLine(String line) {
+	    final String[] s = line.split("\\s+");
+	    if (s[0].equals("all")) {
+		sb.append(String.format(Locale.US, TABLE_FORMAT, experimentName, s[1], s[2]));
+	    }
+	}
+
     }
 }

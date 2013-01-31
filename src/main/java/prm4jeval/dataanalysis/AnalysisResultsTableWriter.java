@@ -176,7 +176,7 @@ public class AnalysisResultsTableWriter {
 	return result;
     }
 
-    private static void writeToFile(String string, String outputPath) {
+    public static void writeToFile(String string, String outputPath) {
 	PrintWriter out = null;
 	try {
 	    out = new PrintWriter(outputPath);
