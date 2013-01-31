@@ -21,7 +21,7 @@ import org.apache.commons.io.FilenameUtils;
 /**
  * Perform analysis based on log files.
  */
-public class Analysis {
+public class Analyzer {
 
     /**
      * Run to perform the analysis and write analysis results into the output location(s).
