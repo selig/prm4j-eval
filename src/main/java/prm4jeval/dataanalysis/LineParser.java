@@ -33,7 +33,9 @@ public abstract class LineParser {
 	String myLine = null;
 	try {
 	    while ((myLine = reader.readLine()) != null) {
-		parseLine(myLine);
+		if (!myLine.trim().isEmpty()) {
+		    parseLine(myLine);
+		}
 	    }
 	} catch (IOException e) {
 	    e.printStackTrace();
