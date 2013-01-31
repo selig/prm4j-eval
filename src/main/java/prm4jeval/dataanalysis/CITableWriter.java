@@ -18,6 +18,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
+import java.util.Map.Entry;
 
 import org.apache.commons.io.FilenameUtils;
 
@@ -28,10 +29,24 @@ public class CITableWriter {
     private final static double confidenceLevel = 0.99D;
 
     /**
-     * Writes an unnormalized single table.
-     *
+     * Writes a sum table
+     * 
      * @param experimentParser
      * @param outputPath
+     * @param comment
+     */
+    public static void writeSumTable(TableParser1 experimentParser, String outputPath, String comment) {
+	final Multimap<String, Double> experiment = experimentParser.getResult();
+	writeToFile(toStringDoubleMap(toOverheadSumMap(experiment)),
+		toFilename(experimentParser, outputPath, optHyphen(comment)));
+    }
+
+    /**
+     * Writes an unnormalized single table.
+     * 
+     * @param experimentParser
+     * @param outputPath
+     * @param comment
      */
     public static void writeCITable(TableParser1 experimentParser, String outputPath, String comment) {
 	final Multimap<String, Double> experiment = experimentParser.getResult();
@@ -40,9 +55,10 @@ public class CITableWriter {
 
     /**
      * Writes an unnormalized table collection.
-     *
+     * 
      * @param experimentParser
      * @param outputPath
+     * @param comment
      */
     public static void writeCITable(TableParser2 experimentParser, String outputPath, String comment) {
 	Map<String, Multimap<String, Double>> experiment = experimentParser.getResult();
@@ -54,7 +70,7 @@ public class CITableWriter {
 
     /**
      * Writes an normalized table collection.
-     *
+     * 
      * @param experimentParser
      * @param outputPath
      */
@@ -97,6 +113,15 @@ public class CITableWriter {
 	return sb.toString();
     }
 
+    private static String toStringDoubleMap(Map<String, Double> sumMap) {
+	final StringBuilder sb = new StringBuilder();
+	for (String invocation : asSortedList(sumMap.keySet())) {
+	    final double sum = sumMap.get(invocation);
+	    sb.append(String.format(Locale.US, "%s  %f\n", invocation, sum));
+	}
+	return sb.toString();
+    }
+
     /**
      * @param mmap
      *            key -> {measurements}
@@ -115,7 +140,7 @@ public class CITableWriter {
     }
 
     /**
-     *
+     * 
      * @param experiment
      *            key -> (mean, ci/2)
      * @param baseline
@@ -135,6 +160,22 @@ public class CITableWriter {
 	return result;
     }
 
+    private static Map<String, Double> toOverheadSumMap(Multimap<String, Double> experiment) {
+	final Map<String, Double> result = new HashMap<String, Double>();
+	for (Entry<String, Collection<Double>> entry : experiment.asMap().entrySet()) {
+	    result.put(entry.getKey(), sumCollection(entry.getValue()));
+	}
+	return result;
+    }
+
+    private static double sumCollection(Collection<Double> doubles) {
+	double result = 0;
+	for (Double d : doubles) {
+	    result += d;
+	}
+	return result;
+    }
+
     private static void writeToFile(String string, String outputPath) {
 	PrintWriter out = null;
 	try {
@@ -143,8 +184,9 @@ public class CITableWriter {
 	} catch (FileNotFoundException e) {
 	    e.printStackTrace();
 	} finally {
-	    if (out != null)
+	    if (out != null) {
 		out.close();
+	    }
 	}
     }
 
