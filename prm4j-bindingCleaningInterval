@@ -66,7 +66,7 @@ for invocation in {0..3}; do
 						-Dprm4j.bindingCleaningInterval=$bindingCleaningInterval \
 						-Dprm4j.monitorCleaningInterval=500 \
 						-Dprm4j.experimentName="${invocation} ${benchmark} ${paramProperty}" \
-						-Dprm4.outputfile=logs/variants/"bCI=$bindingCleaningInterval"/prm4j-stats.log \
+						-Dprm4j.outputfile=logs/variants/"bCI=$bindingCleaningInterval"/prm4j-stats.log \
 						-Dprm4jeval.outputfile=logs/variants/"bCI=$bindingCleaningInterval"/prm4j.log \
 						-Dprm4jeval.benchmark=${benchmark} -Dprm4jeval.paramProperty=${paramProperty} \
 						-cp $DACAPO:$GUAVA:$PRM4J:$APACHEMATH:${DIR}/target/jars/prm4j/${paramProperty}.jar:${DIR}/target/jars/Callback.jar \
