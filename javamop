@@ -1,14 +1,43 @@
 #!/usr/bin/env bash
 #
-# Compiles and runs JavaMOP aspects with the DaCapo-9.12-bach benchmark using aspectj load-time weaving.
+# Compiles, runs and evaluations JavaMOP aspects with the DaCapo-9.12-bach benchmark using aspectj load-time weaving.
 #
-# usage:         ./javamop
 #
-# list of all monitored properties can be found in target/jars/mop; each jar is a property
-# list of all benchmarks can be found at http://dacapobench.org/benchmarks.html 
+# usage:    ./javamop <list of parametric properties> <list of benchmarks
+#           Runs an evaluation of JavaMOP monitoring a parametric property in the given list of parametric properties
+#           and benchmark in the given list of DacCapo benchmarks.
+#
+# examples: ./javamop HasNext avrora
+#           ./javamop "HasNext SafeMapIterator" "avrora h2 tradebeans"
+#
+# usage:    ./javamop       (parameterless)
+#           Runs an evaluation of JavaMOP monitoring a parametric properties in {HasNext SafeIterator SafeMapIterator 
+#           SafeSyncCollection SafeSyncMap} using a DacCapo benchmark in {avrora batik eclipse fop h2 jython luindex 
+#           pmd sunflow tomcat tradebeans tradesoap xalan}.
+#
+# notes:    A list of all monitored properties can be found in target/jars/mop; each jar is a property
+#           A list of all benchmarks can be found at http://dacapobench.org/benchmarks.html
+#           Benchmark "lusearch" is not used because of random crashes in lucine on the evaluation hardware.
+#
+#
+# CONFIGURATION:
+invocations=16 # sets the number of JVM invocations
 
-# remember directory where this script is called
-# (some benchmarks need absolute paths)
+######################################################################################################################
+
+if [ -z "$1" ]; then
+	paramProperties="HasNext SafeIterator SafeMapIterator SafeSyncCollection SafeSyncMap"
+else
+	paramProperties=$1
+fi
+
+if [ -z "$2" ]; then
+	benchmarks="avrora batik eclipse fop h2 jython luindex pmd sunflow tomcat tradebeans tradesoap xalan"
+else
+	benchmarks=$2
+fi
+
+# remember directory where this script is called (some benchmarks need absolute paths)
 DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
 
 echo "Resolving maven dependencies... (may take a while)"
@@ -32,8 +61,8 @@ rm dependency-outputfile dependency-list
 
 # create working and target directories
 rm -rf target
-mkdir -p target/classes/META-INF target/jars/mop target/jars/prm4j
-mkdir -p results
+mkdir -p target/classes/META-INF target/jars/mop
+mkdir -p logs
 
 # compile the aspect into classes
 echo "Compiling aspect..."
@@ -43,9 +72,11 @@ java -jar $AJC -cp ${RT}:${JAVAMOPRT}:$DACAPO:$GUAVA:$APACHEMATH src/main/java/m
 javac src/main/java/prm4jeval/*.java -d target/classes -cp $DACAPO:$APACHEMATH:$GUAVA
 jar cf target/jars/Callback.jar -C target/classes .
 
-# load-time weaving via aspectjweaver, run 16 invocations with up to 25 iterations
-for invocation in {0..15}; do
-	for paramProperty in HasNext SafeIterator SafeMapIterator SafeSyncCollection SafeSyncMap ; do
+echo "Will perform ${invocations} JVM invocations with parametric properties in (${paramProperties}) and benchmarks in (${benchmarks}) until reaching stable state (max. 25 iterations)."
+
+# load-time weaving via aspectjweaver, will run the specified number of invocations with up to 25 iterations
+for invocation in {1..$invocations}; do
+	for paramProperty in $paramProperties ; do
 		
 		# create custom aop-ajc.xml and put in META-INF
 		sed 's/<aspectname>/mop.'$paramProperty'MonitorAspect/g' src/main/resources/mop/aop-ajc.xml > target/classes/META-INF/aop-ajc.xml
@@ -56,12 +87,10 @@ for invocation in {0..15}; do
 		# cleanup custom aop-ajc.xml
 		rm target/classes/META-INF/aop-ajc.xml
 		
-		# lusearch is removed because it keeps on crashing randomly
-		for benchmark in avrora batik eclipse fop h2 jython luindex \
-					pmd sunflow tomcat tradebeans tradesoap xalan ; do
+		for benchmark in $benchmarks ; do
 		STATUS=0
 			while [ $STATUS -eq 0 ]; do
-    			echo "Starting benchmark [javamop:$benchmark:$paramProperty] invocation $invocation..."
+    			echo "Starting benchmark [javamop:$benchmark:$paramProperty] JVM invocation $invocation..."
 				java -Xmx2048M -javaagent:${WEAVER} -Xbootclasspath/a:$RT \
 					-Dprm4jeval.outputfile=logs/javamop.log \
 					-Dprm4jeval.statsLogging=true \
