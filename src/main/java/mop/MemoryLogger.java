@@ -85,7 +85,7 @@ public class MemoryLogger {
     }
 
     /**
-     * Writes memory consumption (mean and max), number of counted events and number of violations to disk.
+     * Writes memory consumption (mean and max), number of counted events and number of matches to disk.
      */
     public void writeToFile(int matchCount) {
 	if (STATS_LOGGING) {

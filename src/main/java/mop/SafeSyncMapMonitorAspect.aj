@@ -948,7 +948,7 @@ public aspect SafeSyncMapMonitorAspect implements javamoprt.MOPObject {
 	 *  prm4j-eval: resets the parametric monitor
 	 */
 	after() : execution (* org.dacapo.harness.Callback+.stop()) {
-		System.out.println("[JavaMOP.SafeSyncMap] Resetting... Reported " + SafeSyncMapMonitor.MATCHES.get() + " violations.");
+		System.out.println("[JavaMOP.SafeSyncMap] Resetting... Reported " + SafeSyncMapMonitor.MATCHES.get() + " matches.");
 
 		memoryLogger.reallyLogMemoryConsumption(); // so we have at least two values
 		
