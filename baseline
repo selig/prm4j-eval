@@ -1,21 +1,32 @@
 #!/usr/bin/env bash
 #
-# Runs the DaCapo-9.12-bach benchmark in {avrora batik eclipse fop h2 jython luindex 
-# pmd sunflow tomcat tradebeans tradesoap xalan} without additions to obtain statistically
-# rigorous runtime performance measures.
+# Compiles, runs and measures a runtime baseline for the test system using the DaCapo-9.12-bach benchmark.
 #
-
 #
-# usage:  ./baseline           (parameterless)
+# usage:    ./baseline <list of benchmarks>
+#           Measures runtime for each benchmark in the given list of DacCapo benchmarks.
+# examples: ./baseline avrora
+#           ./baseline "avrora h2 tradebeans"
 #
-# notes:  A list of all benchmarks can be found at http://dacapobench.org/benchmarks.html
-#         Benchmark "lusearch" is not used because of random crashes in lucine on the evaluation hardware.
+# usage:    ./baseline       (parameterless)
+#            Measures runtime for each benchmark in {avrora batik eclipse fop h2 jython luindex pmd 
+#           sunflow tomcat tradebeans tradesoap xalan}.
+#
+# notes:    A list of all monitored properties can be found in target/jars/mop; each jar is a property
+#           A list of all benchmarks can be found at http://dacapobench.org/benchmarks.html
+#           Benchmark "lusearch" is not used because of random crashes in lucine on the evaluation hardware.
 #
 #
 # CONFIGURATION:
 invocations=16 # sets the number of JVM invocations
 
 ######################################################################################################################
+
+if [ -z "$1" ]; then
+	benchmarks="avrora batik eclipse fop h2 jython luindex pmd sunflow tomcat tradebeans tradesoap xalan"
+else
+	benchmarks=$1
+fi
 
 # remember directory where this script is called (some benchmarks need absolute paths)
 DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
@@ -40,9 +51,9 @@ mkdir -p logs
 javac src/main/java/prm4jeval/* -d target/classes -cp $DACAPO:$APACHEMATH:$GUAVA
 jar cf target/jars/Callback.jar -C target/classes .
 
-echo "Will perform ${invocations} JVM invocations until reaching stable state (max. 25 iterations)."
+echo "Will perform ${invocations} JVM invocations for all benchmarks in (${benchmarks})until reaching stable state (max. 25 iterations)."
 for i in {1..${invocations}}; do
-	for benchmark in avrora batik eclipse fop h2 jython luindex pmd sunflow tomcat tradebeans tradesoap xalan ; do
+	for benchmark in $benchmarks ; do
 	STATUS=0
 		while [ $STATUS -eq 0 ]; do
     		echo "Starting benchmark [baseline:$benchmark] measurement $i..."
