@@ -10,7 +10,9 @@ Although this is a maven project, it is not necessary to `mvn compile` or `mvn i
 * Run a monitoring aspect with
 	* JavaMOP by executing `./javamop <aspectname> <benchmark>`, e.g. `./javamop SafeMapIterator avrora`
 	* prm4j by executing `./prm4j <aspectname> <benchmark>`, e.g. `./prm4j SafeMapIterator avrora`
-* Optional: Run a configured evaluation by executing `./eval`
+* Optional: Run an evaluation over all available parametric properties and benchmarks by calling `./javamop` or `./prm4j`
+
+Additional documentation is provided in the script comments, e.g. it also possible to evaluate lists of aspects and benchmarks.
 
 You **don't** need to have [AspectJ][4] installed, the necessary AJC compiler is retrieved via maven as well.
 
