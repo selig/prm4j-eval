@@ -12,6 +12,10 @@
 #         Benchmark "lusearch" is not used because of random crashes in lucine on the evaluation hardware.
 #
 #
+# CONFIGURATION:
+invocations=16 # sets the number of JVM invocations
+
+######################################################################################################################
 
 # remember directory where this script is called (some benchmarks need absolute paths)
 DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
@@ -36,8 +40,8 @@ mkdir -p logs
 javac src/main/java/prm4jeval/* -d target/classes -cp $DACAPO:$APACHEMATH:$GUAVA
 jar cf target/jars/Callback.jar -C target/classes .
 
-# run 16 invocations with up to 25 iterations
-for i in {0..15}; do
+echo "Will perform ${invocations} JVM invocations until reaching stable state (max. 25 iterations)."
+for i in {1..${invocations}}; do
 	for benchmark in avrora batik eclipse fop h2 jython luindex pmd sunflow tomcat tradebeans tradesoap xalan ; do
 	STATUS=0
 		while [ $STATUS -eq 0 ]; do
