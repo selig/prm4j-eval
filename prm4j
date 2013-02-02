@@ -7,7 +7,7 @@
 # it somewhere else. If no source-version is found, the current snapshot is retrieved from the maven-repository.
 # 
 #
-# usage:    ./prm4j-all <list of parametric properties> <list of benchmarks
+# usage:    ./prm4j <list of parametric properties> <list of benchmarks>
 #           Runs an evaluation of prm4j monitoring a parametric property in the given list of parametric properties
 #           and benchmark in the given list of DacCapo benchmarks.
 # examples: ./prm4j HasNext avrora

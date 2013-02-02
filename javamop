@@ -3,7 +3,7 @@
 # Compiles, runs and evaluations JavaMOP aspects with the DaCapo-9.12-bach benchmark using aspectj load-time weaving.
 #
 #
-# usage:    ./javamop <list of parametric properties> <list of benchmarks
+# usage:    ./javamop <list of parametric properties> <list of benchmarks>
 #           Runs an evaluation of JavaMOP monitoring a parametric property in the given list of parametric properties
 #           and benchmark in the given list of DacCapo benchmarks.
 #
