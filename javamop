@@ -66,10 +66,10 @@ mkdir -p logs
 
 # compile the aspect into classes
 echo "Compiling aspect..."
-java -jar $AJC -cp ${RT}:${JAVAMOPRT}:$DACAPO:$GUAVA:$APACHEMATH src/main/java/mop/* -d target/classes -6
+java -jar $AJC -cp "${RT}:${JAVAMOPRT}:$DACAPO:$GUAVA:$APACHEMATH" src/main/java/mop/* -d target/classes -6
 
 # create jar with callback
-javac src/main/java/prm4jeval/*.java -d target/classes -cp $DACAPO:$APACHEMATH:$GUAVA
+javac src/main/java/prm4jeval/*.java -d target/classes -cp "$DACAPO:$APACHEMATH:$GUAVA"
 jar cf target/jars/Callback.jar -C target/classes .
 
 echo "Will perform ${invocations} JVM invocations with parametric properties in (${paramProperties}) and benchmarks in (${benchmarks}) until reaching static state (max. 25 iterations)."
@@ -91,13 +91,13 @@ for invocation in $(jot $invocations 1) ; do
 		STATUS=0
 			while [ $STATUS -eq 0 ]; do
     			echo "Starting benchmark [javamop:$benchmark:$paramProperty] JVM invocation $invocation..."
-				java -Xmx2048M -javaagent:${WEAVER} -Xbootclasspath/a:$RT \
+				java -Xmx2048M -javaagent:"$WEAVER" -Xbootclasspath/a:"$RT" \
 					-Dprm4jeval.outputfile=logs/javamop.log \
 					-Dprm4jeval.statsLogging=true \
 					-Dprm4jeval.benchmark="${benchmark}" \
 					-Dprm4jeval.paramProperty="${paramProperty}" \
 					-Dprm4jeval.invocation="${invocation}" \
-					-cp $DACAPO:$GUAVA:$JAVAMOPRT:$APACHEMATH:${DIR}/target/jars/mop/$paramProperty.jar:${DIR}/target/jars/Callback.jar \
+					-cp "$DACAPO:$GUAVA:$JAVAMOPRT:$APACHEMATH:${DIR}/target/jars/mop/$paramProperty.jar:${DIR}/target/jars/Callback.jar" \
 					Harness --no-validation -c prm4jeval.EvalCallback $benchmark
 				STATUS=$?
 			done

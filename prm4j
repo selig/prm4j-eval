@@ -77,7 +77,7 @@ mkdir -p target/classes/META-INF target/jars/prm4j
 
 # compile the aspect into classes
 echo "Compiling aspect..."
-java -jar $AJC -cp $GUAVA:$PRM4J:$RT:$DACAPO:$APACHEMATH src/main/java/prm4j/* -d target/classes -6
+java -jar $AJC -cp "$GUAVA:$PRM4J:$RT:$DACAPO:$APACHEMATH" src/main/java/prm4j/* -d target/classes -6
 
 # create jar with callback
 javac src/main/java/prm4jeval/*.java -d target/classes -cp $DACAPO:$APACHEMATH:$GUAVA
@@ -102,7 +102,7 @@ for invocation in $(jot $invocations 1) ; do
 			STATUS=0
 				while [ $STATUS -eq 0 ]; do
 	    			echo "Starting benchmark [prm4j:$benchmark:$paramProperty] JVM invocation ${invocation}..."
-					java -Xmx2048M -javaagent:${WEAVER} -Xbootclasspath/a:$RT \
+					java -Xmx2048M -javaagent:"${WEAVER}" -Xbootclasspath/a:"$RT" \
 						-Dprm4jeval.invocation=${invocation} \
 						-Dprm4j.debug=true \
 						-Dprm4j.bindingCleaningInterval=10000 \
@@ -111,7 +111,7 @@ for invocation in $(jot $invocations 1) ; do
 						-Dprm4j.outputfile=logs/prm4j-stats.log \
 						-Dprm4jeval.outputfile=logs/prm4j.log \
 						-Dprm4jeval.benchmark=${benchmark} -Dprm4jeval.paramProperty=${paramProperty} \
-						-cp $DACAPO:$GUAVA:$PRM4J:$APACHEMATH:${DIR}/target/jars/prm4j/${paramProperty}.jar:${DIR}/target/jars/Callback.jar \
+						-cp "$DACAPO:$GUAVA:$PRM4J:$APACHEMATH:${DIR}/target/jars/prm4j/${paramProperty}.jar:${DIR}/target/jars/Callback.jar" \
 						Harness --no-validation -c prm4jeval.EvalCallback ${benchmark}
 					STATUS=$?
 			done

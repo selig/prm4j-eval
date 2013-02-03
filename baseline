@@ -49,14 +49,14 @@ rm -rf target
 mkdir -p target/classes/META-INF target/jars
 
 # create jar with callback
-javac src/main/java/prm4jeval/*.java -d target/classes -cp $DACAPO:$APACHEMATH:$GUAVA
+javac src/main/java/prm4jeval/*.java -d target/classes -cp "$DACAPO:$APACHEMATH:$GUAVA"
 jar cf target/jars/Callback.jar -C target/classes .
 
 # create dir for logs
 mkdir -p logs
 
 # create jar with callback
-javac src/main/java/prm4jeval/EvalCallback.java src/main/java/prm4jeval/SteadyStateInvocation.java -d target/classes -cp $DACAPO:$APACHEMATH:$GUAVA
+javac src/main/java/prm4jeval/EvalCallback.java src/main/java/prm4jeval/SteadyStateInvocation.java -d target/classes -cp "$DACAPO:$APACHEMATH:$GUAVA"
 jar cf target/jars/Callback.jar -C target/classes .
 
 echo "Will perform ${invocations} JVM invocations for all benchmarks in (${benchmarks}) until reaching static state (max. 25 iterations)."
@@ -69,7 +69,7 @@ for invocation in $(jot $invocations 1) ; do
 				-Dprm4jeval.outputfile=logs/baseline.log \
 				-Dprm4jeval.invocation=$invocation \
 				-Dprm4jeval.benchmark=$benchmark -Dprm4jeval.parametricProperty=- \
-				-cp $DACAPO:$GUAVA:$APACHEMATH:${DIR}/target/jars/Callback.jar \
+				-cp "$DACAPO:$GUAVA:$APACHEMATH:${DIR}/target/jars/Callback.jar" \
 				Harness --no-validation -c prm4jeval.EvalCallback $benchmark
 			STATUS=$?
 		done
