@@ -14,7 +14,7 @@ Although this is a maven project, it is not necessary to `mvn compile` or `mvn i
 
 Additional documentation is provided in the script comments, e.g. it also possible to evaluate lists of aspects and benchmarks.
 
-You **don't** need to have [AspectJ][4] installed, the necessary AJC compiler is retrieved via maven as well.
+You **don't** need to have [AspectJ][4] installedt to execute the scripts, the necessary AJC compiler is retrieved via maven as well. To edit and build the project in Eclipse, you need m2e and AJDT with  AJDT m2e Configurator.
 
 ---
 
