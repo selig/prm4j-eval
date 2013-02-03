@@ -72,10 +72,10 @@ java -jar $AJC -cp ${RT}:${JAVAMOPRT}:$DACAPO:$GUAVA:$APACHEMATH src/main/java/m
 javac src/main/java/prm4jeval/*.java -d target/classes -cp $DACAPO:$APACHEMATH:$GUAVA
 jar cf target/jars/Callback.jar -C target/classes .
 
-echo "Will perform ${invocations} JVM invocations with parametric properties in (${paramProperties}) and benchmarks in (${benchmarks}) until reaching stable state (max. 25 iterations)."
+echo "Will perform ${invocations} JVM invocations with parametric properties in (${paramProperties}) and benchmarks in (${benchmarks}) until reaching static state (max. 25 iterations)."
 
 # load-time weaving via aspectjweaver, will run the specified number of invocations with up to 25 iterations
-for invocation in {1..$invocations}; do
+for invocation in $(jot $invocations 1) ; do
 	for paramProperty in $paramProperties ; do
 		
 		# create custom aop-ajc.xml and put in META-INF
