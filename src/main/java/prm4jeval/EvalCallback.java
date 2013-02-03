@@ -29,7 +29,7 @@ public class EvalCallback extends Callback {
 	super(args);
 	logger = getFileLogger(getMandatorySystemProperty("prm4jeval.outputfile"));
 	benchmark = getMandatorySystemProperty("prm4jeval.benchmark");
-	paramProperty = getMandatorySystemProperty("prm4jeval.paramProperty");
+	paramProperty = getSystemProperty("prm4jeval.paramProperty", "-");
 	invocation = Integer.parseInt(getMandatorySystemProperty("prm4jeval.invocation"));
     }
 
@@ -107,6 +107,11 @@ public class EvalCallback extends Callback {
 	    throw new RuntimeException("System property [" + key + "] is mandatory but not defined!");
 	}
 	return value;
+    }
+
+    static String getSystemProperty(String key, String defaultValue) {
+	final String value = System.getProperty(key);
+	return value != null ? value : defaultValue;
     }
 
 }
