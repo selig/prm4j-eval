@@ -56,8 +56,6 @@ public class Analyzer {
 		finalOutputPath);
 	writeJavaMOPStatsTables(concat(finalInputPath, "javamop-stats.log"), finalOutputPath);
 
-	writeNormalizedPerformanceTable(concat(finalInputPath, "prm4j.log"), concat(finalInputPath, "baseline.log"),
-		finalOutputPath);
 	writePrm4jStatsTables(concat(finalInputPath, "prm4j-stats.log"), finalOutputPath);
 
 	// perform an analysis of all implementation variants of prm4j
@@ -73,6 +71,8 @@ public class Analyzer {
 		final String variantPath = variant.getAbsolutePath();
 		final File variantOutputPath = new File(concat(outputPath, FilenameUtils.getBaseName(variantPath)));
 		variantOutputPath.mkdir();
+		writeNormalizedPerformanceTable(concat(variantPath, "prm4j.log"),
+			concat(inputPath, "baseline-small.log"), variantOutputPath.getAbsolutePath());
 		writeNormalizedSummedPerformanceTable(concat(variantPath, "prm4j.log"),
 			concat(inputPath, "baseline-small.log"), variantOutputPath.getAbsolutePath());
 		writePrm4jStatsTables(concat(variantPath, "prm4j-stats.log"), variantOutputPath.getAbsolutePath());
