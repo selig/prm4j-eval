@@ -107,6 +107,8 @@ for invocation in $(jot $invocations 1) ; do
 						-Dprm4j.debug=true \
 						-Dprm4j.bindingCleaningInterval=10000 \
 						-Dprm4j.monitorCleaningInterval=500 \
+						-Dprm4j.checkMonitorValidityOnEachUpdate=true \
+						-Dprm4j.linkedListStoredBacklinks=true \
 						-Dprm4j.experimentName="${invocation} ${benchmark} ${paramProperty}" \
 						-Dprm4j.outputfile=logs/prm4j-stats.log \
 						-Dprm4jeval.outputfile=logs/prm4j.log \
