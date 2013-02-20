@@ -71,10 +71,10 @@ public class Analyzer {
 		final String variantPath = variant.getAbsolutePath();
 		final File variantOutputPath = new File(concat(outputPath, FilenameUtils.getBaseName(variantPath)));
 		variantOutputPath.mkdir();
-		writeNormalizedPerformanceTable(concat(variantPath, "prm4j.log"),
-			concat(inputPath, "baseline-small.log"), variantOutputPath.getAbsolutePath());
+		writeNormalizedPerformanceTable(concat(variantPath, "prm4j.log"), concat(variantPath, "baseline.log"),
+			variantOutputPath.getAbsolutePath());
 		writeNormalizedSummedPerformanceTable(concat(variantPath, "prm4j.log"),
-			concat(inputPath, "baseline-small.log"), variantOutputPath.getAbsolutePath());
+			concat(variantPath, "baseline.log"), variantOutputPath.getAbsolutePath());
 		writePrm4jStatsTables(concat(variantPath, "prm4j-stats.log"), variantOutputPath.getAbsolutePath());
 
 		// aggregate all variant results into one file for convenience
