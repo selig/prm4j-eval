@@ -40,7 +40,7 @@ public aspect HasNext extends Prm4jAspect {
 
     pointcut HasNext_next(Iterator i) : call(* Iterator.next()) && target(i)  && prm4jPointcut();
 
-    after(Iterator i) : HasNext_next(i) {
+    before(Iterator i) : HasNext_next(i) {
 	pm.processEvent(fsm.next.createEvent(i));
     }
 
