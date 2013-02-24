@@ -103,12 +103,12 @@ for invocation in $(jot $invocations 1) ; do
 				while [ $STATUS -eq 0 ]; do
 	    			echo "Starting benchmark [prm4j:$benchmark:$paramProperty] JVM invocation ${invocation}..."
 					java -Xmx2048M -javaagent:"${WEAVER}" -Xbootclasspath/a:"$RT" \
+						-Dprm4j.logging=true \
 						-Dprm4jeval.invocation=${invocation} \
-						-Dprm4j.debug=true \
-						-Dprm4j.bindingCleaningInterval=10000 \
-						-Dprm4j.monitorCleaningInterval=500 \
+						-Dprm4j.bindingCleaningInterval=5000 \
+						-Dprm4j.monitorCleaningInterval=5000 \
 						-Dprm4j.checkMonitorValidityOnEachUpdate=true \
-						-Dprm4j.linkedListStoredBacklinks=true \
+						-Dprm4j.linkedListStoredBacklinks=false \
 						-Dprm4j.experimentName="${invocation} ${benchmark} ${paramProperty}" \
 						-Dprm4j.outputfile=logs/prm4j-stats.log \
 						-Dprm4jeval.outputfile=logs/prm4j.log \
