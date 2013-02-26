@@ -44,8 +44,9 @@ public class FSM_SafeIterator {
     public final FSMState error = fsm.createAcceptingState(matchHandler);
 
     public FSM_SafeIterator() {
-	initial.addTransition(updateColl, initial);
-	initial.addTransition(createIter, s1);
+	initial.addTransition(updateColl, initial); // self-loop
+	initial.addTransition(useIter, initial); // self-loop
+	initial.addTransition(createIter, s1); // creation event
 	s1.addTransition(useIter, s1);
 	s1.addTransition(updateColl, s2);
 	s2.addTransition(updateColl, s2);

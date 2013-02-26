@@ -25,35 +25,37 @@ import prm4j.api.fsm.FSMState;
 @SuppressWarnings("rawtypes")
 public class FSM_SafeMapIterator {
 
-	public final Alphabet alphabet = new Alphabet();
+    public final Alphabet alphabet = new Alphabet();
 
-	public final Parameter<Map> m = alphabet.createParameter("m", Map.class);
-	public final Parameter<Collection> c = alphabet.createParameter("c", Collection.class);
-	public final Parameter<Iterator> i = alphabet.createParameter("i", Iterator.class);
+    public final Parameter<Map> m = alphabet.createParameter("m", Map.class);
+    public final Parameter<Collection> c = alphabet.createParameter("c", Collection.class);
+    public final Parameter<Iterator> i = alphabet.createParameter("i", Iterator.class);
 
-	public final Symbol2<Map, Collection> createColl = alphabet.createSymbol2("createColl", m, c);
-	public final Symbol2<Collection, Iterator> createIter = alphabet.createSymbol2("createIter", c, i);
-	public final Symbol1<Map> updateMap = alphabet.createSymbol1("updateMap", m);
-	public final Symbol1<Iterator> useIter = alphabet.createSymbol1("useIter", i);
+    public final Symbol2<Map, Collection> createColl = alphabet.createSymbol2("createColl", m, c);
+    public final Symbol2<Collection, Iterator> createIter = alphabet.createSymbol2("createIter", c, i);
+    public final Symbol1<Map> updateMap = alphabet.createSymbol1("updateMap", m);
+    public final Symbol1<Iterator> useIter = alphabet.createSymbol1("useIter", i);
 
-	public final FSM fsm = new FSM(alphabet);
+    public final FSM fsm = new FSM(alphabet);
 
-	public final  MatchHandler matchHandler = MatchHandler.NO_OP;
+    public final MatchHandler matchHandler = MatchHandler.NO_OP;
 
-	public final FSMState initial = fsm.createInitialState();
-	public final FSMState s1 = fsm.createState();
-	public final FSMState s2 = fsm.createState();
-	public final FSMState s3 = fsm.createState();
-	public final FSMState error = fsm.createAcceptingState(matchHandler);
+    public final FSMState initial = fsm.createInitialState();
+    public final FSMState s1 = fsm.createState();
+    public final FSMState s2 = fsm.createState();
+    public final FSMState s3 = fsm.createState();
+    public final FSMState error = fsm.createAcceptingState(matchHandler);
 
-	public FSM_SafeMapIterator() {
-	    initial.addTransition(createColl, s1);
-	    initial.addTransition(updateMap, initial);
-	    s1.addTransition(updateMap, s1);
-	    s1.addTransition(createIter, s2);
-	    s2.addTransition(useIter, s2);
-	    s2.addTransition(updateMap, s3);
-	    s3.addTransition(updateMap, s3);
-	    s3.addTransition(useIter, error);
-	}
+    public FSM_SafeMapIterator() {
+	initial.addTransition(createColl, s1); // creation event
+	initial.addTransition(updateMap, initial); // self-loop
+	initial.addTransition(useIter, initial); // self-loop
+	initial.addTransition(createIter, initial); // self-loop
+	s1.addTransition(updateMap, s1);
+	s1.addTransition(createIter, s2);
+	s2.addTransition(useIter, s2);
+	s2.addTransition(updateMap, s3);
+	s3.addTransition(updateMap, s3);
+	s3.addTransition(useIter, error);
+    }
 }

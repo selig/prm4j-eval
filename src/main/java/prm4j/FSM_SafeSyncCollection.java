@@ -36,7 +36,7 @@ public class FSM_SafeSyncCollection {
 
     public final FSM fsm = new FSM(alphabet);
 
-    public final  MatchHandler matchHandler = MatchHandler.NO_OP;
+    public final MatchHandler matchHandler = MatchHandler.NO_OP;
 
     public final FSMState initial = fsm.createInitialState();
     public final FSMState s1 = fsm.createState();
@@ -44,7 +44,10 @@ public class FSM_SafeSyncCollection {
     public final FSMState error = fsm.createAcceptingState(matchHandler);
 
     public FSM_SafeSyncCollection() {
-	initial.addTransition(sync, s1);
+	initial.addTransition(sync, s1); // creation event
+	initial.addTransition(asyncCreateIter, initial); // self-loop
+	initial.addTransition(syncCreateIter, initial); // self-loop
+	initial.addTransition(accessIter, initial); // self-loop
 	s1.addTransition(asyncCreateIter, error);
 	s1.addTransition(syncCreateIter, s2);
 	s2.addTransition(accessIter, error);
