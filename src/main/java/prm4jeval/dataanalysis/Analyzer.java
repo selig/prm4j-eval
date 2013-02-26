@@ -90,10 +90,11 @@ public class Analyzer {
 	writeStatsTable(logName, outputPath, "matches", "MATCHES", 5);
 	writeStatsTable(logName, outputPath, "memory-mean", "MEMORY", 5);
 	writeStatsTable(logName, outputPath, "memory-max", "MEMORY", 6);
-	writeStatsTable(logName, outputPath, "monitors-created", "MONITORS", 5);
+	writeStatsTable(logName, outputPath, "monitors-created-alive", "MONITORS", 5);
 	writeStatsTable(logName, outputPath, "monitors-updated", "MONITORS", 6);
 	writeStatsTable(logName, outputPath, "monitors-ophaned", "MONITORS", 7);
 	writeStatsTable(logName, outputPath, "monitors-collected", "MONITORS", 8);
+	writeStatsTable(logName, outputPath, "monitors-created-dead", "MONITORS", 9);
 	writeStatsTable(logName, outputPath, "bindings-created", "BINDINGS", 5);
 	writeStatsTable(logName, outputPath, "bindings-collected", "BINDINGS", 6);
 	writeStatsTable(logName, outputPath, "bindings-stored", "BINDINGS", 7);
@@ -157,7 +158,10 @@ public class Analyzer {
 			if (split[3].equals(rowFilter)) {
 			    // the first measurement of each invocation will not be counted (warm-up)
 			    if (!skippedFirstLines.add(split[0] + " " + split[1] + " " + split[2])) {
-				put(split[2], split[1], Double.parseDouble(split[columnNr]));
+				// this allows that older logs still work: robustness regarding missing columns
+				if (columnNr < split.length) {
+				    put(split[2], split[1], Double.parseDouble(split[columnNr]));
+				}
 			    }
 			}
 		    }
