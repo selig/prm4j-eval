@@ -92,7 +92,7 @@ public class Analyzer {
 	writeStatsTable(logName, outputPath, "memory-max", "MEMORY", 6);
 	writeStatsTable(logName, outputPath, "monitors-created-alive", "MONITORS", 5);
 	writeStatsTable(logName, outputPath, "monitors-updated", "MONITORS", 6);
-	writeStatsTable(logName, outputPath, "monitors-ophaned", "MONITORS", 7);
+	writeStatsTable(logName, outputPath, "monitors-orphaned", "MONITORS", 7);
 	writeStatsTable(logName, outputPath, "monitors-collected", "MONITORS", 8);
 	writeStatsTable(logName, outputPath, "monitors-created-dead", "MONITORS", 9);
 	writeStatsTable(logName, outputPath, "bindings-created", "BINDINGS", 5);
