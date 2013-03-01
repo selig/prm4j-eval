@@ -22,43 +22,43 @@ import prm4j.api.fsm.FSMSpec;
 
 @SuppressWarnings("rawtypes")
 @SuppressAjWarnings({"adviceDidNotMatch"})
-public aspect SafeMapIterator extends Prm4jAspect {
+public aspect UnsafeMapIterator extends Prm4jAspect {
     
-    final FSM_SafeMapIterator fsm;
+    final FSM_UnsafeMapIterator fsm;
     final ParametricMonitor pm;
 
-    public SafeMapIterator() {
-	fsm = new FSM_SafeMapIterator();
+    public UnsafeMapIterator() {
+	fsm = new FSM_UnsafeMapIterator();
 	pm = ParametricMonitorFactory.createParametricMonitor(new FSMSpec(fsm.fsm));
-	System.out.println("[prm4j.SafeMapIterator] Created!");
+	System.out.println("[prm4j.UnsafeMapIterator] Created!");
     }
 
-    pointcut SafeMapIterator_createColl(Map map) : (call(* Map.values()) || call(* Map.keySet())) && target(map) && prm4jPointcut();
+    pointcut UnsafeMapIterator_createColl(Map map) : (call(* Map.values()) || call(* Map.keySet())) && target(map) && prm4jPointcut();
 
-    after(Map map) returning (Collection c) : SafeMapIterator_createColl(map) {
+    after(Map map) returning (Collection c) : UnsafeMapIterator_createColl(map) {
 	pm.processEvent(fsm.createColl.createEvent(map, c));
     }
 
-    pointcut SafeMapIterator_createIter(Collection c) : call(* Collection.iterator()) && target(c) && prm4jPointcut();
+    pointcut UnsafeMapIterator_createIter(Collection c) : call(* Collection.iterator()) && target(c) && prm4jPointcut();
 
-    after(Collection c) returning (Iterator i) : SafeMapIterator_createIter(c) {
+    after(Collection c) returning (Iterator i) : UnsafeMapIterator_createIter(c) {
 	pm.processEvent(fsm.createIter.createEvent(c, i));
     }
 
-    pointcut SafeMapIterator_useIter(Iterator i) : call(* Iterator.next()) && target(i) && prm4jPointcut();
+    pointcut UnsafeMapIterator_useIter(Iterator i) : call(* Iterator.next()) && target(i) && prm4jPointcut();
 
-    before(Iterator i) : SafeMapIterator_useIter(i) {
+    before(Iterator i) : UnsafeMapIterator_useIter(i) {
 	pm.processEvent(fsm.useIter.createEvent(i));
     }
 
-    pointcut SafeMapIterator_updateMap(Map map) : (call(* Map.put*(..)) || call(* Map.putAll*(..)) || call(* Map.clear()) || call(* Map.remove*(..))) && target(map) && prm4jPointcut();
+    pointcut UnsafeMapIterator_updateMap(Map map) : (call(* Map.put*(..)) || call(* Map.putAll*(..)) || call(* Map.clear()) || call(* Map.remove*(..))) && target(map) && prm4jPointcut();
 
-    after(Map map) : SafeMapIterator_updateMap(map) {
+    after(Map map) : UnsafeMapIterator_updateMap(map) {
 	pm.processEvent(fsm.updateMap.createEvent(map));
     }
     
     after() : execution (* org.dacapo.harness.Callback+.stop()) {
-  	System.out.println("[prm4j.SafeMapIterator] Stopping and resetting...");
+  	System.out.println("[prm4j.UnsafeMapIterator] Stopping and resetting...");
 	pm.reset();
 	System.gc();
 	System.gc();

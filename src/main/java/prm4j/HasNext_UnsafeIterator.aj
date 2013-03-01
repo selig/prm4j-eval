@@ -22,21 +22,21 @@ import org.aspectj.lang.annotation.SuppressAjWarnings;
 
 @SuppressWarnings("rawtypes")
 @SuppressAjWarnings({ "adviceDidNotMatch" })
-public aspect HasNext_SafeIterator extends Prm4jAspect {
+public aspect HasNext_UnsafeIterator extends Prm4jAspect {
 
     final FSM_HasNext fsm1;
     final ParametricMonitor pm1;
-    final FSM_SafeIterator fsm2;
+    final FSM_UnsafeIterator fsm2;
     final ParametricMonitor pm2;
 
     // HasNext
     
-    public HasNext_SafeIterator() {
+    public HasNext_UnsafeIterator() {
 	fsm1 = new FSM_HasNext();
 	pm1 = ParametricMonitorFactory.createParametricMonitor(new FSMSpec(fsm1.fsm));
-	fsm2 = new FSM_SafeIterator();
+	fsm2 = new FSM_UnsafeIterator();
 	pm2 = ParametricMonitorFactory.createParametricMonitor(new FSMSpec(fsm2.fsm));
-	System.out.println("[prm4j.HasNext+SafeIterator] Created!");
+	System.out.println("[prm4j.HasNext+UnsafeIterator] Created!");
     }
 
     pointcut HasNext_hasnext(Iterator i) : call(* Iterator.hasNext()) && target(i) && prm4jPointcut();
@@ -55,7 +55,7 @@ public aspect HasNext_SafeIterator extends Prm4jAspect {
 	}
     }
 
-    // SafeIterator
+    // UnsafeIterator
 
     after(Collection c) returning (Iterator i) : (call(Iterator Collection+.iterator()) && target(c)) && prm4jPointcut() {
 	synchronized (this) {
@@ -76,11 +76,11 @@ public aspect HasNext_SafeIterator extends Prm4jAspect {
     }
 
     before() : execution (* Callback+.start(String)) {
-	System.out.println("[prm4j.HasNext+SafeIterator] Starting...");
+	System.out.println("[prm4j.HasNext+UnsafeIterator] Starting...");
     }
 
     after() : execution (* org.dacapo.harness.Callback+.stop()) {
-	System.out.println("[prm4j.HasNext+SafeIterator] Stopping and resetting...");
+	System.out.println("[prm4j.HasNext+UnsafeIterator] Stopping and resetting...");
 	pm1.reset();
 	pm2.reset();
 	System.gc();
