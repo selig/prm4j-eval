@@ -8,10 +8,10 @@
 #           and benchmark in the given list of DacCapo benchmarks.
 #
 # examples: ./javamop HasNext avrora
-#           ./javamop "HasNext SafeMapIterator" "avrora h2 tradebeans"
+#           ./javamop "HasNext UnsafeMapIterator" "avrora h2 tradebeans"
 #
 # usage:    ./javamop       (parameterless)
-#           Runs an evaluation of JavaMOP monitoring a parametric properties in {HasNext SafeIterator SafeMapIterator 
+#           Runs an evaluation of JavaMOP monitoring a parametric properties in {HasNext UnsafeIterator UnsafeMapIterator 
 #           SafeSyncCollection SafeSyncMap} using a DacCapo benchmark in {avrora batik eclipse fop h2 jython luindex 
 #           pmd sunflow tomcat tradebeans tradesoap xalan}.
 #
@@ -26,7 +26,7 @@ invocations=16 # sets the number of JVM invocations
 ######################################################################################################################
 
 if [ -z "$1" ]; then
-	paramProperties="HasNext SafeIterator SafeMapIterator SafeSyncCollection SafeSyncMap"
+	paramProperties="HasNext UnsafeIterator UnsafeMapIterator SafeSyncCollection SafeSyncMap"
 else
 	paramProperties=$1
 fi
