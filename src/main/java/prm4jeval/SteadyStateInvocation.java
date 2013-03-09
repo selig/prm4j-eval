@@ -25,21 +25,24 @@ public class SteadyStateInvocation implements Serializable {
     protected final int window;
     protected int iteration;
     private final DescriptiveStatistics measurements;
+    private final int maxIterations;
 
-    public SteadyStateInvocation(int window, double covThreshold) {
+    public SteadyStateInvocation(int window, double covThreshold, int maxIterations) {
 	this.window = window;
 	this.covThreshold = covThreshold;
+	this.maxIterations = maxIterations;
 	measurements = new DescriptiveStatistics(window);
     }
 
     public SteadyStateInvocation() {
 	window = Integer.parseInt(getSystemProperty("prm4jeval.window", "5"));
 	covThreshold = Double.parseDouble(getSystemProperty("prm4jeval.covThreshold", "0.02"));
+	maxIterations = Integer.parseInt(getSystemProperty("prm4jeval.maxIterations", "25"));
 	measurements = new DescriptiveStatistics(window);
     }
 
     /**
-     *
+     * 
      * @param time
      * @return <code>true</code> if more measurements are needed
      */
@@ -59,9 +62,9 @@ public class SteadyStateInvocation implements Serializable {
 	    System.out.println("Reached cov-threshold: " + cov);
 	    return true;
 	}
-	if (iteration >= 25) {
-	    System.out.println("Performed 25 iterations, proceeding with cov=" + cov + " and mean of last " + window
-		    + " measurements: " + measurements.getMean());
+	if (iteration >= maxIterations) {
+	    System.out.println("Performed " + maxIterations + " iterations, proceeding with cov=" + cov
+		    + " and mean of last " + window + " measurements: " + measurements.getMean());
 	    return true;
 	}
 	return false;

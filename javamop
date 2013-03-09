@@ -22,6 +22,7 @@
 #
 # CONFIGURATION:
 invocations=16 # sets the number of JVM invocations
+maxIterations=25 # sets the maximal number iterations per JVM incocation
 
 ######################################################################################################################
 
@@ -72,7 +73,7 @@ java -jar $AJC -cp "${RT}:${JAVAMOPRT}:$DACAPO:$GUAVA:$APACHEMATH" src/main/java
 javac src/main/java/prm4jeval/*.java -d target/classes -cp "$DACAPO:$APACHEMATH:$GUAVA"
 jar cf target/jars/Callback.jar -C target/classes .
 
-echo "Will perform ${invocations} JVM invocations with parametric properties in (${paramProperties}) and benchmarks in (${benchmarks}) until reaching static state (max. 25 iterations)."
+echo "Will perform ${invocations} JVM invocations with parametric properties in (${paramProperties}) and benchmarks in (${benchmarks}) until reaching static state (max. $maxIterations iterations)."
 
 # load-time weaving via aspectjweaver, will run the specified number of invocations with up to 25 iterations
 for invocation in $(jot $invocations 1) ; do
@@ -97,6 +98,7 @@ for invocation in $(jot $invocations 1) ; do
 					-Dprm4jeval.benchmark="${benchmark}" \
 					-Dprm4jeval.paramProperty="${paramProperty}" \
 					-Dprm4jeval.invocation="${invocation}" \
+					-Dprm4jeval.maxIterations=${maxIterations} \
 					-cp "$DACAPO:$GUAVA:$JAVAMOPRT:$APACHEMATH:${DIR}/target/jars/mop/$paramProperty.jar:${DIR}/target/jars/Callback.jar" \
 					Harness --no-validation -c prm4jeval.EvalCallback $benchmark
 				STATUS=$?

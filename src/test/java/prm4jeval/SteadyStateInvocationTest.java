@@ -22,7 +22,7 @@ public class SteadyStateInvocationTest {
 
     @Before
     public void init() {
-	ssi = new SteadyStateInvocation(5, 0.2D);
+	ssi = new SteadyStateInvocation(5, 0.2D, 25);
     }
 
     @Test
