@@ -38,6 +38,7 @@ public class SteadyStateInvocation implements Serializable {
 	window = Integer.parseInt(getSystemProperty("prm4jeval.window", "5"));
 	covThreshold = Double.parseDouble(getSystemProperty("prm4jeval.covThreshold", "0.02"));
 	maxIterations = Integer.parseInt(getSystemProperty("prm4jeval.maxIterations", "25"));
+	System.out.println("maxiterations=" + maxIterations);
 	measurements = new DescriptiveStatistics(window);
     }
 
@@ -53,19 +54,32 @@ public class SteadyStateInvocation implements Serializable {
 	return isThresholdReached();
     }
 
+    /**
+     * @return true if we have enough measurements for this invocation.
+     */
     public boolean isThresholdReached() {
-	if (measurements.getN() < window) {
-	    return false;
-	}
-	double cov = getCoefficientOfStandardDeviation();
-	if (cov < covThreshold) {
-	    System.out.println("Reached cov-threshold: " + cov);
-	    return true;
-	}
-	if (iteration >= maxIterations) {
-	    System.out.println("Performed " + maxIterations + " iterations, proceeding with cov=" + cov
-		    + " and mean of last " + window + " measurements: " + measurements.getMean());
-	    return true;
+	if (maxIterations >= window) {
+	    if (measurements.getN() < window) {
+		return false;
+	    }
+	    double cov = getCoefficientOfStandardDeviation();
+	    if (cov < covThreshold) {
+		System.out.println("Reached cov-threshold: " + cov);
+		return true;
+	    }
+	    if (iteration >= maxIterations) {
+		System.out.println("Performed " + maxIterations + " iterations, proceeding with cov=" + cov
+			+ " and mean of last " + window + " measurements: " + measurements.getMean());
+		return true;
+	    }
+	} else {
+	    if (iteration >= maxIterations) {
+		System.out.println("Performed " + maxIterations + " iterations, proceeding with cov="
+			+ getCoefficientOfStandardDeviation() + " and mean of last " + iteration + " measurements: "
+			+ measurements.getMean()
+			+ " Warning: The number of maxIterations was smaller than the window size.");
+		return true;
+	    }
 	}
 	return false;
     }
