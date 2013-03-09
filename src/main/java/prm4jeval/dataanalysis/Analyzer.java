@@ -51,7 +51,8 @@ public class Analyzer {
 
 	// write benchmark means
 	writeBaselinePerformanceTable(concat(finalInputPath, "baseline.log"), finalOutputPath);
-
+	writeNormalizedPerformanceTable(concat(finalInputPath, "prm4j.log"), concat(finalInputPath, "baseline.log"),
+		finalOutputPath);
 	writeNormalizedPerformanceTable(concat(finalInputPath, "javamop.log"), concat(finalInputPath, "baseline.log"),
 		finalOutputPath);
 	writeJavaMOPStatsTables(concat(finalInputPath, "javamop-stats.log"), finalOutputPath);
