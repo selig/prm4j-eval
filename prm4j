@@ -25,7 +25,7 @@
 #
 # CONFIGURATION:
 invocations=16 # sets the number of JVM invocations
-maxIterations=25 # sets the maximal number iterations per JVM incocation
+maxIterations=25 # sets the maximal number iterations per JVM invocation
 
 ######################################################################################################################
 
