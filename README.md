@@ -16,11 +16,6 @@ Additional documentation is provided in the script comments, e.g. it also possib
 
 You **don't** need to have [AspectJ][4] installedt to execute the scripts, the necessary AJC compiler is retrieved via maven as well. To edit and build the project in Eclipse, you need m2e and AJDT with  AJDT m2e Configurator.
 
----
-
-Part of my thesis; currently in development (pre-alpha).
-
-
   [1]: https://github.com/parzonka/prm4j
   [2]: http://fsl.cs.uiuc.edu/index.php/Special:JavaMOP3
   [3]: http://dacapobench.org
