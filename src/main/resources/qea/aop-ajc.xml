@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<aspectj>
+	<aspects>
+		<aspect name="<aspectname>" />
+	</aspects>
+	<weaver>
+		<include>org.dacapo.harness.Callback</include>
+		<exclude within="org.aspectj..*" />
+		<exclude within="qea..*" />
+		<exclude within="prm4jeval..*" />
+		<exclude within="org.apache.commons..*" />
+		<exclude within="com.google..*" />
+		<exclude within="org.netbeans.lib.profiler..*" />
+	</weaver>
+</aspectj>

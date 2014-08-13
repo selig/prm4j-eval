@@ -1,17 +1,19 @@
 #!/usr/bin/env bash
 #
-# Compiles, runs and evaluations JavaMOP aspects with the DaCapo-9.12-bach benchmark using aspectj load-time weaving.
+# Compiles, runs and evaluations QEA aspects with the DaCapo-9.12-bach benchmark using aspectj load-time weaving.
+#
+# Created by Giles Reger by copying and altering the javamop file.
 #
 #
-# usage:    ./javamop <list of parametric properties> <list of benchmarks>
-#           Runs an evaluation of JavaMOP monitoring a parametric property in the given list of parametric properties
+# usage:    ./qea <list of parametric properties> <list of benchmarks>
+#           Runs an evaluation of QEA monitoring a parametric property in the given list of parametric properties
 #           and benchmark in the given list of DacCapo benchmarks.
 #
-# examples: ./javamop HasNext avrora
-#           ./javamop "HasNext UnsafeMapIterator" "avrora h2 tradebeans"
+# examples: ./qea HasNext avrora
+#           ./qea "HasNext UnsafeMapIterator" "avrora h2 tradebeans"
 #
-# usage:    ./javamop       (parameterless)
-#           Runs an evaluation of JavaMOP monitoring a parametric properties in {HasNext UnsafeIterator UnsafeMapIterator 
+# usage:    ./qea       (parameterless)
+#           Runs an evaluation of QEA monitoring a parametric properties in {HasNext UnsafeIterator UnsafeMapIterator 
 #           SafeSyncCollection SafeSyncMap} using a DacCapo benchmark in {avrora batik eclipse fop h2 jython luindex 
 #           pmd sunflow tomcat tradebeans tradesoap xalan}.
 #
@@ -52,9 +54,10 @@ tr ':' '\n' < dependency-outputfile > dependency-list
 AJC=$(grep "aspectjtools" dependency-list)
 RT=$(grep "aspectjrt" dependency-list)
 WEAVER=$(grep "aspectjweaver" dependency-list)
-JAVAMOPRT=$(grep "javamoprt" dependency-list)
+QEART=$(grep "qea" dependency-list)
 GUAVA=$(grep "guava" dependency-list)
 APACHEMATH=$(grep "math3" dependency-list)
+APACHECOM=$(grep "collections4" dependency-list)
 DACAPO=$(grep "dacapo" dependency-list)
 
 # cleanup tempfiles
@@ -62,12 +65,12 @@ rm dependency-outputfile dependency-list
 
 # create working and target directories
 rm -rf target
-mkdir -p target/classes/META-INF target/jars/mop
+mkdir -p target/classes/META-INF target/jars/qea
 mkdir -p logs
 
 # compile the aspect into classes
 echo "Compiling aspect..."
-java -jar $AJC -cp "${RT}:${JAVAMOPRT}:$DACAPO:$GUAVA:$APACHEMATH" src/main/java/mop/* -d target/classes -6
+java -jar $AJC -cp "${RT}:${QEART}:$DACAPO:$GUAVA:$APACHEMATH" src/main/java/qea/* -d target/classes -7
 
 # create jar with callback
 javac src/main/java/prm4jeval/*.java -d target/classes -cp "$DACAPO:$APACHEMATH:$GUAVA"
@@ -75,15 +78,16 @@ jar cf target/jars/Callback.jar -C target/classes .
 
 echo "Will perform ${invocations} JVM invocations with parametric properties in (${paramProperties}) and benchmarks in (${benchmarks}) until reaching static state (max. $maxIterations iterations)."
 
+
 # load-time weaving via aspectjweaver, will run the specified number of invocations with up to 25 iterations
 for invocation in $(jot $invocations 1) ; do
 	for paramProperty in $paramProperties ; do
 		
 		# create custom aop-ajc.xml and put in META-INF
-		sed 's/<aspectname>/mop.'$paramProperty'MonitorAspect/g' src/main/resources/mop/aop-ajc.xml > target/classes/META-INF/aop-ajc.xml
+		sed 's/<aspectname>/qea.'$paramProperty'Aspect/g' src/main/resources/qea/aop-ajc.xml > target/classes/META-INF/aop-ajc.xml
 
 		# repackage each aspect into a single jars with the custom aop-ajc.xml
-		jar cf target/jars/mop/${paramProperty}.jar -C target/classes META-INF/aop-ajc.xml -C target/classes mop/${paramProperty}Monitor.class -C target/classes mop/${paramProperty}Monitor_Set.class -C target/classes mop/${paramProperty}MonitorAspect.class -C target/classes mop/MemoryLogger.class
+		jar cf target/jars/qea/${paramProperty}.jar -C target/classes META-INF/aop-ajc.xml -C target/classes qea/${paramProperty}Aspect.class -C target/classes qea/MemoryLogger.class
 
 		# cleanup custom aop-ajc.xml
 		rm target/classes/META-INF/aop-ajc.xml
@@ -91,15 +95,15 @@ for invocation in $(jot $invocations 1) ; do
 		for benchmark in $benchmarks ; do
 		STATUS=0
 			while [ $STATUS -eq 0 ]; do
-    			echo "Starting benchmark [javamop:$benchmark:$paramProperty] JVM invocation $invocation..."
+    			echo "Starting benchmark [qea:$benchmark:$paramProperty] JVM invocation $invocation..."
 				java -Xmx2048M -javaagent:"$WEAVER" -Xbootclasspath/a:"$RT" \
-					-Dprm4jeval.outputfile=logs/javamop.log \
+					-Dprm4jeval.outputfile=logs/qea.log \
 					-Dprm4jeval.statsLogging=true \
 					-Dprm4jeval.benchmark="${benchmark}" \
 					-Dprm4jeval.paramProperty="${paramProperty}" \
 					-Dprm4jeval.invocation="${invocation}" \
 					-Dprm4jeval.maxIterations=${maxIterations} \
-					-cp "$DACAPO:$GUAVA:$JAVAMOPRT:$APACHEMATH:${DIR}/target/jars/mop/$paramProperty.jar:${DIR}/target/jars/Callback.jar" \
+					-cp "$DACAPO:$GUAVA:$QEART:$APACHEMATH:$APACHECOM:${DIR}/target/jars/qea/$paramProperty.jar:${DIR}/target/jars/Callback.jar" \
 					Harness --no-validation -c prm4jeval.EvalCallback $benchmark
 				STATUS=$?
 			done
