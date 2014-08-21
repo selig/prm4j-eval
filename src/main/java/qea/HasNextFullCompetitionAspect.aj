@@ -1,9 +1,3 @@
-/**
- * NOTE - this uses a simplified version of HasNext that
- * does not check that hasNext returns true, as this is
- * the behaviour checked by prm4j
- */
-
 package qea; 
 
 import java.util.Iterator;
@@ -17,11 +11,12 @@ import qea.monitoring.impl.*;
 import qea.monitoring.intf.*;
 import qea.structure.impl.other.Verdict;
 
-public aspect HasNextAspect {
+public aspect HasNextFullCompetitionAspect {
 
         // Declaring the events 
-        private final int HASNEXT = 1;
-        private final int NEXT = 2;
+        private final int HASNEXT_TRUE = 1;
+        private final int HASNEXT_FALSE = 2;
+        private final int NEXT = 3;
 
 	//The monitor
 	Monitor monitor;
@@ -37,7 +32,8 @@ public aspect HasNextAspect {
 	after(Iterator i) returning(boolean b): hasNext(i) {
 		synchronized(LOCK){
 			memoryLogger.logMemoryConsumption(); // prm4j-eval
-			check(monitor.step(HASNEXT,i)); 
+			if(b){ check(monitor.step(HASNEXT_TRUE,i)); }
+			else { check(monitor.step(HASNEXT_FALSE,i)); }
 		}
         }
         @SuppressWarnings("unchecked")
@@ -48,51 +44,55 @@ public aspect HasNextAspect {
 		}
         }
 
-	private static void check(Verdict verdict){
+	private void check(Verdict verdict){
 		if(verdict==Verdict.FAILURE){
-			//System.err.println("Error detected, exiting...");
-			MATCHES.incrementAndGet();
+			System.err.println("Error detected, exiting...");
+			report(true);
+			System.exit(0);
 		}
 	}
 
 	private final MemoryLogger memoryLogger; //prm4j-eval
-	private static AtomicInteger MATCHES = new AtomicInteger(); //prm4j-eval
 	public void init(){
 		QEABuilder b = new QEABuilder("HasNext");	
 		
 		int i = -1;
 		b.addQuantification(FORALL,i);
 	
-		b.addTransition(1,HASNEXT,i,2);
-		b.addTransition(2,HASNEXT,i,2);
+		b.addTransition(1,HASNEXT_TRUE,i,2);
+		b.addTransition(2,HASNEXT_TRUE,i,2);
 		b.addTransition(2,NEXT,i,1);
 
-		b.addFinalStates(1,2);
+		b.addTransition(2,HASNEXT_FALSE,i,3);
+		b.addTransition(3,HASNEXT_FALSE,i,3);
+
+		b.addFinalStates(1,2,3);
 
 		// Need to make with garbage reset
 		monitor = MonitorFactory.create(b.make(),RestartMode.IGNORE,GarbageMode.LAZY);
 	}
 
 
-	public HasNextAspect(){
+	public HasNextFullCompetitionAspect(){
 		init();
 		System.out.println("[qea.HasNext] Started"); //prm4j-eval
 		memoryLogger = new MemoryLogger(); // prm4j-eval
 	}
 
-/**
+	/**
          *  prm4j-eval: resets the parametric monitor
          */
         after() : execution (* org.dacapo.harness.Callback+.stop()) {
-                System.out.println("[qea.HasNext] Resetting... Reported " + MATCHES.get() + " matches.");
+		report(false);
+	}
+	public void report(boolean error){
+                System.out.println("[qea.HasNext] Resetting... ");
 
                 memoryLogger.reallyLogMemoryConsumption(); // so we have at least two values
 
 		init();
 
-                memoryLogger.writeToFile(MATCHES.get());
-
-                MATCHES.set(0); // reset counter
+                memoryLogger.writeToFile(error ? 1 : 0);
 
                 System.gc();
                 System.gc();

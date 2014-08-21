@@ -3,7 +3,7 @@
 	<aspects>
 		<aspect name="<aspectname>" />
 	</aspects>
-	<weaver>
+	<weaver options="-Xjoinpoints:synchronization">
 		<include>org.dacapo.harness.Callback</include>
 		<exclude within="org.aspectj..*" />
 		<exclude within="qea..*" />

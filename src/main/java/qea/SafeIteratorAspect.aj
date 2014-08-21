@@ -1,12 +1,7 @@
-/**
- * NOTE - this uses a simplified version of HasNext that
- * does not check that hasNext returns true, as this is
- * the behaviour checked by prm4j
- */
-
 package qea; 
 
 import java.util.Iterator;
+import java.util.Collection;
 import java.util.concurrent.atomic.AtomicInteger;
 
 //Imports for QEA
@@ -16,11 +11,12 @@ import qea.creation.QEABuilder;
 import qea.monitoring.impl.*;
 import qea.monitoring.intf.*;
 import qea.structure.impl.other.Verdict;
+import qea.structure.intf.*;
 
-public aspect HasNextAspect {
+public aspect SafeIteratorAspect {
 
         // Declaring the events 
-        private final int HASNEXT = 1;
+        private final int ITERATOR = 1;
         private final int NEXT = 2;
 
 	//The monitor
@@ -29,15 +25,15 @@ public aspect HasNextAspect {
 
 
 	@SuppressWarnings("unchecked")
-	pointcut hasNext(Iterator i) : call(* java.util.Iterator+.hasNext()) && target(i);
+	pointcut create(Collection c) : (call(Iterator Collection+.iterator()) && target(c));
 	@SuppressWarnings("unchecked")
 	pointcut next(Iterator i) :  call(* java.util.Iterator+.next()) && target(i);	
 		
 	@SuppressWarnings("unchecked")
-	after(Iterator i) returning(boolean b): hasNext(i) {
+	after(Collection c) returning(Iterator i): create(c) {
 		synchronized(LOCK){
 			memoryLogger.logMemoryConsumption(); // prm4j-eval
-			check(monitor.step(HASNEXT,i)); 
+			check(monitor.step(ITERATOR,i,c.size())); 
 		}
         }
         @SuppressWarnings("unchecked")
@@ -58,14 +54,15 @@ public aspect HasNextAspect {
 	private final MemoryLogger memoryLogger; //prm4j-eval
 	private static AtomicInteger MATCHES = new AtomicInteger(); //prm4j-eval
 	public void init(){
-		QEABuilder b = new QEABuilder("HasNext");	
+		QEABuilder b = new QEABuilder("SafeIterator");	
 		
 		int i = -1;
+		int size = 1;
 		b.addQuantification(FORALL,i);
 	
-		b.addTransition(1,HASNEXT,i,2);
-		b.addTransition(2,HASNEXT,i,2);
-		b.addTransition(2,NEXT,i,1);
+		b.addTransition(1,ITERATOR,new int[]{i,size},2);
+		b.addTransition(2,NEXT,new int[]{i},Guard.varIsGreaterThanVal(size,0),
+					 Assignment.decrement(size),2);
 
 		b.addFinalStates(1,2);
 
@@ -74,9 +71,9 @@ public aspect HasNextAspect {
 	}
 
 
-	public HasNextAspect(){
+	public SafeIteratorAspect(){
 		init();
-		System.out.println("[qea.HasNext] Started"); //prm4j-eval
+		System.out.println("[qea.SafeIterator] Started"); //prm4j-eval
 		memoryLogger = new MemoryLogger(); // prm4j-eval
 	}
 
@@ -84,7 +81,7 @@ public aspect HasNextAspect {
          *  prm4j-eval: resets the parametric monitor
          */
         after() : execution (* org.dacapo.harness.Callback+.stop()) {
-                System.out.println("[qea.HasNext] Resetting... Reported " + MATCHES.get() + " matches.");
+                System.out.println("[qea.SafeIterator] Resetting... Reported " + MATCHES.get() + " matches.");
 
                 memoryLogger.reallyLogMemoryConsumption(); // so we have at least two values
 

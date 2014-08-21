@@ -40,6 +40,13 @@ else
 	benchmarks=$2
 fi
 
+if [ -z "$3" ]; then
+	comp=false
+else
+	comp=$3
+fi
+
+
 # remember directory where this script is called (some benchmarks need absolute paths)
 DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
 
@@ -70,7 +77,7 @@ mkdir -p logs
 
 # compile the aspect into classes
 echo "Compiling aspect..."
-java -jar $AJC -cp "${RT}:${QEART}:$DACAPO:$GUAVA:$APACHEMATH" src/main/java/qea/* -d target/classes -7
+java -jar $AJC -cp "${RT}:${QEART}:$DACAPO:$GUAVA:$APACHEMATH" src/main/java/qea/* -d target/classes -7 -Xjoinpoints:synchronization
 
 # create jar with callback
 javac src/main/java/prm4jeval/*.java -d target/classes -cp "$DACAPO:$APACHEMATH:$GUAVA"
@@ -83,11 +90,17 @@ echo "Will perform ${invocations} JVM invocations with parametric properties in 
 for invocation in $(jot $invocations 1) ; do
 	for paramProperty in $paramProperties ; do
 		
+		if $comp; then
+			paramPropertyName=$paramProperty'Competition';
+		else
+			paramPropertyName=$paramProperty;
+		fi
+
 		# create custom aop-ajc.xml and put in META-INF
-		sed 's/<aspectname>/qea.'$paramProperty'Aspect/g' src/main/resources/qea/aop-ajc.xml > target/classes/META-INF/aop-ajc.xml
+		sed 's/<aspectname>/qea.'$paramPropertyName'Aspect/g' src/main/resources/qea/aop-ajc.xml > target/classes/META-INF/aop-ajc.xml
 
 		# repackage each aspect into a single jars with the custom aop-ajc.xml
-		jar cf target/jars/qea/${paramProperty}.jar -C target/classes META-INF/aop-ajc.xml -C target/classes qea/${paramProperty}Aspect.class -C target/classes qea/MemoryLogger.class
+		jar cf target/jars/qea/${paramProperty}.jar -C target/classes META-INF/aop-ajc.xml -C target/classes qea/${paramPropertyName}Aspect.class -C target/classes qea/MemoryLogger.class
 
 		# cleanup custom aop-ajc.xml
 		rm target/classes/META-INF/aop-ajc.xml
